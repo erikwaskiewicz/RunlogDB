@@ -77,26 +77,6 @@ def parse2(run_folder, dictionary, variable, header):
         for row in itertools.islice(samplesheet, start_row + 1, row_count):
             var_list.append(row[start_col])
 
-    # Rename pipeline names to something more meaningful -- For 'Description' column only.
-    # This will work on data from all columns but it is unlikely that these variables will appear in them, and it
-    # shouldn't matter if they do.
-    # Add panel information here if new panels added
-    for count, var in enumerate(var_list):
-        if "TruSightOne" in var:
-            var_list[count] = "TSO"
-        if "TruSightCancer" in var:
-            var_list[count] = "TSC"
-        if "NGHS-101X-WCB" in var:
-            var_list[count] = "WCB"
-        if "CRUK" in var:
-            var_list[count] = "CRUK"
-        if "NGHS-201X" in var:
-            var_list[count] = "TAM"
-        if "NGHS-102X" in var:
-            var_list[count] = "BRCA"
-        if "NGHS-101X" in var:
-            var_list[count] = "CRM"
-
     # Make array containing a list of unique values from var_array
     var_unique = []
     for var in var_list:
@@ -108,13 +88,57 @@ def parse2(run_folder, dictionary, variable, header):
     # Concatenate list of unique values into a string, rename to "Null" if list is empty. Add result to dictionary.
     var_unique = sorted(var_unique)
     for var in var_unique:
-        var_str += str(var) + "-"
-    if 'cfDNAHiSeq' in dictionary["Description"]:
-        if variable == "Plates":
-            var_str = dictionary["Experiment Name"]
-            dictionary["Experiment Name"] = dictionary["Investigator Name"]
-        if variable == "Pipeline":
-            var_str = "NIPT"
+        var_str += str(var) + ", "
     if var_str == "":
         var_str = "Null"
-    dictionary[variable] = var_str.rstrip('-')
+    dictionary[variable] = var_str.rstrip(', ')
+
+
+def parse3(dictionary):
+    # Rename pipeline names to something more meaningful -- For 'Description' column only.
+    # This will work on data from all columns but it is unlikely that these variables will appear in them, and it
+    # shouldn't matter if they do.
+    # Add panel information here if new panels added
+    var_list = dictionary["Description2"].split(',')
+    out_list = []
+    out_str = ""
+    for var in var_list:
+        if "NGHS-101X-WCB" in var:
+            out_list += ["WCB"]
+        elif "NGHS-101X" in var:
+            out_list += ["CRM"]
+        elif "NGHS-102X" in var:
+            out_list += ["BRCA"]
+        elif "CRUK" in var:
+            out_list += ["CRUK"]
+        elif "TruSightCancer" in var:
+            out_list += ["TruSightCancer"]
+        elif "TruSightOne" in var:
+            out_list += ["TruSightOne"]
+        elif "NGHS-201X" in var:
+            out_list += ["TAM"]
+        # Currently don't have a better identifier for NIPT
+        elif "cfDNA" in var:
+            out_list += ["NIPT"]
+            experiment = dictionary["Experiment Name"]
+            investigator = dictionary["Investigator Name"]
+            dictionary["Experiment Name"] = investigator
+            dictionary["Investigator Name"] = experiment
+
+    # Make array containing a list of unique values from var_array
+    var_unique = []
+    for var in out_list:
+        if var not in var_unique:
+            var_unique.append(var)
+        if var == "":
+            var_unique.remove(var)
+
+    # Concatenate list of unique values into a string, rename to "Null" if list is empty. Add result to dictionary.
+    var_unique = sorted(var_unique)
+    for var in var_unique:
+        out_str += str(var) + ", "
+    if out_str == "":
+        out_str = "Null"
+    dictionary["Pipeline"] = out_str.rstrip(', ')
+
+    return dictionary

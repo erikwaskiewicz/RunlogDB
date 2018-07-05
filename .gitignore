@@ -1,0 +1,3 @@
+# ignore database and upload log
+runlog/runlogdb.sqlite3
+runlog_upload_log.txt

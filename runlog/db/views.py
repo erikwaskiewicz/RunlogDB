@@ -16,12 +16,11 @@ def index(request):
             runs = Runlog.objects.filter(instrument_date__range=(dates.start_date, dates.end_date)).order_by('-instrument_date')
             # open empty excel workbook
             wb = openpyxl.Workbook()
-            headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date', 'TAT']
-            panels = ['BRCA', 'CRM', 'CRUK', 'NIPT', 'TAM', 'TSC', 'TSO', 'WCB']
+            panels = ['BRCA', 'CRM', 'CRUK', 'NIPT', 'TAM', 'TruSightCancer', 'TruSightOne']
             # Fill in raw data tab, panels tab and others tab
-            tab_raw(wb, runs, headers)
-            tab_panels(wb, runs, headers, panels)
-            tab_other(wb, runs, headers, panels)
+            tab_raw(wb, runs)
+            tab_other(wb, runs, panels)
+            tab_panels(wb, runs, panels)
             # save and return workbook as response
             response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheet.sheet')
             output_name = 'attachment; filename="KPI_' + str(dates.start_date) + '_' + str(dates.end_date) + '.xlsx"'

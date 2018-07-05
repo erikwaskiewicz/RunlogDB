@@ -1,9 +1,10 @@
-def tab_raw(wb, runs, headers):
+def tab_raw(wb, runs):
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date']
     ws = wb.get_active_sheet()
     ws.title = 'raw'
     
     row_no = 0
-    for col in range(len(headers)-1):
+    for col in range(len(headers)):
         c = ws.cell(row=row_no + 1, column=col + 1)
         c.value = headers[col]
     for obj in runs:
@@ -21,7 +22,8 @@ def tab_raw(wb, runs, headers):
     return wb
 
 
-def tab_panels(wb, runs, headers, panels):
+def tab_panels(wb, runs, panels):
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date', 'TAT']
     for panel in panels:
         qs = runs.filter(pipeline__contains=panel)
         ws = wb.create_sheet(title=panel)
@@ -47,7 +49,8 @@ def tab_panels(wb, runs, headers, panels):
     return wb
 
 
-def tab_other(wb, runs, headers, panels):
+def tab_other(wb, runs, panels):
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date', 'Description', 'TAT']
     qs = runs
     for panel in panels:
         qs = qs.exclude(pipeline__contains=panel)
@@ -63,6 +66,7 @@ def tab_other(wb, runs, headers, panels):
             obj.pipeline,
             obj.run_id,
             obj.experiment,
+            obj.description2,
             obj.samplesheet_date,
             obj.instrument_date,
         ]

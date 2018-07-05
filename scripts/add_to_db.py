@@ -1,7 +1,7 @@
 import sqlite3
 
 
-DB = '/data/diagnostics/apps/RunlogDB/runlog/runlogdb.sqlite3'
+DB = '/Users/erik/Projects/RunlogDB/runlog/runlogdb.sqlite3'
 
 def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
     db = sqlite3.connect(DB)
@@ -21,10 +21,11 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             description, 
             chemistry,
             plates,
-            pipeline,
+            description2,
             samples,
             I7,
             I5,
+            pipeline,
             percent_Q30,
             cluster_density,
             percent_pf,
@@ -33,7 +34,7 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             error_rate,
             percent_aligned
             )
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
            (runinfo_dict["Id"],
             runinfo_dict["Instrument"],
             runinfo_dict["Date"],
@@ -48,10 +49,11 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             samplesheet_dict["Description"],
             samplesheet_dict["Chemistry"],
             samplesheet_dict["Plates"],
-            samplesheet_dict["Pipeline"],
+            samplesheet_dict["Description2"],
             samplesheet_dict["Samples"],
             samplesheet_dict["I7"],
             samplesheet_dict["I5"],
+            samplesheet_dict["Pipeline"],
             interop_dict["Percent Q30"],
             interop_dict["Cluster density"],
             interop_dict["Percent PF"],

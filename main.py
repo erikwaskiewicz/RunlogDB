@@ -39,16 +39,18 @@ parse_runinfo.parse2(run_folder, runinfo_dict)
 # create empty dictionary and define parameters to extract
 samplesheet_dict = {}
 samplesheet_values1 = ["Investigator Name", "Experiment Name", "Date", "Workflow", "Application", "Assay", "Description", "Chemistry"]
-samplesheet_values2 = [["Plates", "Sample_Plate"], ["Pipeline", "Description"], ["Samples", "Sample_ID"], ["I7", "I7_Index_ID"], ["I5", "I5_Index_ID"]]
+samplesheet_values2 = [["Plates", "Sample_Plate"], ["Description2", "Description"], ["Samples", "Sample_ID"], ["I7", "I7_Index_ID"], ["I5", "I5_Index_ID"]]
 
 # data from samplesheet values array
 for item in samplesheet_values1:
     parse_samplesheet.parse1(run_folder, samplesheet_dict, item)
 
-# plates & pipeline
+# plates, description, samples and indexes
 for item in samplesheet_values2:
     parse_samplesheet.parse2(run_folder, samplesheet_dict, item[0], item[1])
 
+# pipeline
+parse_samplesheet.parse3(samplesheet_dict)
 
 # ----------------------------------------------------------------------------------------------------
 # PARSE INTEROPS

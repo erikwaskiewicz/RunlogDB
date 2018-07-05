@@ -15,10 +15,11 @@ class Runlog(models.Model):
     description = models.CharField(max_length=200, null=True)
     chemistry = models.CharField(max_length=100, null=True)
     plates = models.TextField(null=True)
-    pipeline = models.TextField(null=True)
+    description2 = models.TextField(null=True)
     samples = models.TextField(null=True)
     I7 = models.TextField(null=True)
     I5 = models.TextField(null=True)
+    pipeline = models.TextField(null=True)
     percent_Q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     cluster_density = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     percent_pf = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
@@ -26,6 +27,10 @@ class Runlog(models.Model):
     prephasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     error_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     percent_aligned = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    sensitivity = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    sensitivity_lower_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    sensitivity_upper_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    diagnostic_run = models.BooleanField(default=True)
     comments = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.run_id
