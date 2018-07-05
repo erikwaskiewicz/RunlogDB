@@ -1,0 +1,20 @@
+{% extends 'db/base.html' %}
+
+{% block content %}
+<h3>KPI query</h3>
+<br>
+
+<div class="card bg-light" style="width:350px">
+    <div class="card-body">
+        <h5 class="card-title">Enter date range:</h5>
+        <form method="POST" class="post-form">{% csrf_token %}
+            <table>
+                {{ form.as_table }}
+            </table>
+            <br>
+            <button type="submit" class="save btn btn-sm btn-primary float-right">Download</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}
