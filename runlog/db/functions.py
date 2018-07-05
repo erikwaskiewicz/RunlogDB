@@ -1,5 +1,5 @@
 def tab_raw(wb, runs):
-    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date']
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Setup Date', 'Run Date']
     ws = wb.get_active_sheet()
     ws.title = 'raw'
     
@@ -13,7 +13,7 @@ def tab_raw(wb, runs):
             obj.pipeline,
             obj.run_id,
             obj.experiment,
-            obj.samplesheet_date,
+            obj.setup_date,
             obj.instrument_date,
         ]
         for col in range(len(row)):
@@ -23,7 +23,7 @@ def tab_raw(wb, runs):
 
 
 def tab_panels(wb, runs, panels):
-    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date', 'TAT']
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Setup Date', 'Run Date', 'TAT']
     for panel in panels:
         qs = runs.filter(pipeline__contains=panel)
         ws = wb.create_sheet(title=panel)
@@ -38,7 +38,7 @@ def tab_panels(wb, runs, panels):
                 obj.pipeline,
                 obj.run_id,
                 obj.experiment,                        
-                obj.samplesheet_date,
+                obj.setup_date,
                 obj.instrument_date,
             ]
             for col in range(len(row)):
@@ -50,7 +50,7 @@ def tab_panels(wb, runs, panels):
 
 
 def tab_other(wb, runs, panels):
-    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Run Date', 'Description', 'TAT']
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Description', 'Setup Date', 'Run Date', 'TAT']
     qs = runs
     for panel in panels:
         qs = qs.exclude(pipeline__contains=panel)
@@ -67,12 +67,12 @@ def tab_other(wb, runs, panels):
             obj.run_id,
             obj.experiment,
             obj.description2,
-            obj.samplesheet_date,
+            obj.setup_date,
             obj.instrument_date,
         ]
         for col in range(len(row)):
             c = ws.cell(row=row_no + 1, column=col + 1)
             c.value = row[col]
         c = ws.cell(row=row_no + 1, column=len(row) + 1)
-        c.value = '=NETWORKDAYS(D' + str(n+2) + ',E' + str(n+2) + ',1)'
+        c.value = '=NETWORKDAYS(E' + str(n+2) + ',F' + str(n+2) + ',1)'
     return wb

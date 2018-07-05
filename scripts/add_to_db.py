@@ -32,9 +32,10 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             phasing,
             prephasing,
             error_rate,
-            percent_aligned
+            percent_aligned,
+            diagnostic_run
             )
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
            (runinfo_dict["Id"],
             runinfo_dict["Instrument"],
             runinfo_dict["Date"],
@@ -60,7 +61,8 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             interop_dict["Phasing"],
             interop_dict["Prephasing"],
             interop_dict["Error rate"],
-            interop_dict["Aligned"]))
+            interop_dict["Aligned"],
+            True))
     db.commit()
     db.close()
 
