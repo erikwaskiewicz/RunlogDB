@@ -23,7 +23,9 @@ run_folder = sys.argv[1]
 
 # Create empty runinfo dictionary and define parameters to extract from RunInfo
 runinfo_dict = {}
-runinfo_values = [["Id", "get"], ["Instrument", "find"], ["Date", "find"]]
+runinfo_values = [["Id", "get"], 
+                  ["Instrument", "find"], 
+                  ["Date", "find"]]
 
 # data from runinfo_values array
 for item in runinfo_values:
@@ -38,8 +40,13 @@ parse_runinfo.parse2(run_folder, runinfo_dict)
 
 # create empty dictionary and define parameters to extract
 samplesheet_dict = {}
-samplesheet_values1 = ["Investigator Name", "Experiment Name", "Date", "Workflow", "Application", "Assay", "Description", "Chemistry"]
-samplesheet_values2 = [["Plates", "Sample_Plate"], ["Description2", "Description"], ["Samples", "Sample_ID"], ["I7", "I7_Index_ID"], ["I5", "I5_Index_ID"]]
+samplesheet_values1 = ["Investigator Name", "Experiment Name", "Date", "Workflow", "Application", 
+    "Assay", "Description", "Chemistry"]
+samplesheet_values2 = [["Plates", "Sample_Plate"], 
+                       ["Description2", "Description"], 
+                       ["Samples", "Sample_ID"], 
+                       ["I7", "I7_Index_ID"], 
+                       ["I5", "I5_Index_ID"]]
 
 # data from samplesheet values array
 for item in samplesheet_values1:
@@ -75,10 +82,11 @@ add_to_db.runinfo_add(runinfo_dict, samplesheet_dict, interop_dict)
 if parse_runparameters.instrument_type(run_folder) == "HiSeq":
     # create empty dictionary and define variables to be extracted
     hiseq_dict = {}
-    runparameter_values1 = ["RunID", "WorkFlowType", "PairEndFC", "Flowcell", "Sbs", "Pe", "Index", "ClusteringChoice",
-                            "RapidRunChemistry", "RunMode", "ApplicationName", "ApplicationVersion", "FPGAVersion",
-                            "CPLDVersion", "RTAVersion", "ChemistryVersion", "CameraFirmware", "CameraDriver"]
-    runparameter_values2 = [["Sbs", "SbsReagentKit"], ["Index", "ReagentKit"]]
+    runparameter_values1 = ["RunID", "WorkFlowType", "PairEndFC", "Flowcell", "Sbs", "Pe", "Index", 
+        "ClusteringChoice", "RapidRunChemistry", "RunMode", "ApplicationName", "ApplicationVersion", 
+        "FPGAVersion", "CPLDVersion", "RTAVersion", "ChemistryVersion", "CameraFirmware", "CameraDriver"]
+    runparameter_values2 = [["Sbs", "SbsReagentKit"], 
+                            ["Index", "ReagentKit"]]
 
     # extract variables
     for item in runparameter_values1:
@@ -122,11 +130,11 @@ if parse_runparameters.instrument_type(run_folder) == "NextSeq":
     # create empty dictionary and define variables to be extracted
     nextseq_dict = {}
     runparameter_values1 = ["RunID", "InstrumentID", "RTAVersion", "SystemSuiteVersion", "FlowCellSerial",
-    "PR2BottleSerial", "ReagentKitSerial", "ExperimentName", "LibraryID", "Chemistry", "FocusMethod", 
-    "SurfaceToScan", "IsPairedEnd", "CustomReadOnePrimer", "CustomReadTwoPrimer", "CustomIndexPrimer", 
-    "CustomIndexTwoPrimer", "UsesCustomReadOnePrimer", "UsesCustomReadTwoPrimer", "UsesCustomIndexPrimer",
-    "UsesCustomIndexTwoPrimer", "RunManagementType", "BaseSpaceRunId", "BaseSpaceRunMode", "ComputerName",
-    "MaxCyclesSupportedByReagentKit"]
+        "PR2BottleSerial", "ReagentKitSerial", "ExperimentName", "LibraryID", "Chemistry", "FocusMethod", 
+        "SurfaceToScan", "IsPairedEnd", "CustomReadOnePrimer", "CustomReadTwoPrimer", "CustomIndexPrimer", 
+        "CustomIndexTwoPrimer", "UsesCustomReadOnePrimer", "UsesCustomReadTwoPrimer", 
+        "UsesCustomIndexPrimer", "UsesCustomIndexTwoPrimer", "RunManagementType", "BaseSpaceRunId", 
+        "BaseSpaceRunMode", "ComputerName", "MaxCyclesSupportedByReagentKit"]
     runparameter_values2 = [["Setup", "ApplicationVersion"],
                             ["Setup", "ApplicationName"]]
 

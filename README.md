@@ -1,5 +1,14 @@
 # RunlogDB
 
+Database to record parameters from NGS runs as they come off the machines. It consists of a Django app with a SQLite3 backend 
+and a simple HTML/ Bootstrap frontend to be used for querying the data. Data is uploaded by a seperate Python script, main.py.  
+
+Currently the only querying possible is a simple search function and a query to download a spreadsheet containing the data 
+necessary for producing the monthly NGS KPIs (setup date and run date, split by pipeline). There is a lot of scope to develop 
+new features for the frontend.  
+
+This database was a project for my STP Computing for Clinical Scientists (SBI101) rotation.
+
 ## Setup
 - Copy over whole directory
 - Create conda ennvironment from yaml file
