@@ -9,6 +9,18 @@ new features for the frontend.
 
 This database was a project for my STP Computing for Clinical Scientists (SBI101) rotation.
 
+## Parameters
+
+The database is split into three tables:
+- Runlog: data common to all sequencing runs, regardless of instrument type.
+  - Run ID, worksheet ID, panels, sample IDs
+  - Setup and run dates
+  - QC metrics - interops and sensitivity data
+  - Other data pulled from the samplesheet
+- Miseq/Hiseq/Nextseq tables: data specific to the relevent instrument.
+  - Specific data about the sequencer settings 
+  - Pulled from the RunParameters.xml file
+
 ## Setup
 - Copy over whole directory
 - Create conda ennvironment from yaml file
@@ -28,8 +40,29 @@ This database was a project for my STP Computing for Clinical Scientists (SBI101
 - add commands in ```scripts/cron.sh``` to cron job to find and add any further runs as they are made
 - host frontend on cluster usign apache - TO DO
 
+### Directory structure
+```bash
+RunlogDB
+|-- runlog
+|   |-- db
+|   |-- runlog
+|   |-- manage.py
+|   |-- runlogdb.sqlite3
+|-- scripts
+|   |-- __pycache__
+|   |-- add_archive.sh
+|   |-- add_nipt.sh
+|-- main.py
+|-- README.md
+|-- runlog_upload_log.txt
+|-- runlogdb-env.yml
+```
 
-## Potential errors
+## Potential upload errors
+There are some common errors when upaloding a run to the database, they are shown below.
+Most commly it is either the samplesheet has been setup incorrectly or the run failed, 
+meaning that the required files aren't present.
+
 - ERROR 1: run failed/ not organised in usual way
 ```bash
 ERROR  Could not open file /data/archive/miseq/161215_M00766_0104_000000000-AVB1R/RunInfo.xml
