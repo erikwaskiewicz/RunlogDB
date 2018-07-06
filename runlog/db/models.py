@@ -1,5 +1,6 @@
 from django.db import models
 
+# Table for storing information common to all NGS runs, regardless of instrument type
 class Runlog(models.Model):
     run_id = models.CharField(max_length=100, primary_key=True)
     diagnostic_run = models.BooleanField()
@@ -37,6 +38,7 @@ class Runlog(models.Model):
         return self.run_id
 
 
+# Table for storing MiSeq specific run parameters
 class Miseq(models.Model):
     run_id = models.ForeignKey(
         'Runlog',
@@ -57,6 +59,7 @@ class Miseq(models.Model):
         return self.run_id_id
 
 
+# Table for storing HiSeq specific run parameters
 class Hiseq(models.Model):
     run_id = models.ForeignKey(
         'Runlog',
@@ -85,6 +88,7 @@ class Hiseq(models.Model):
         return self.run_id_id
 
 
+# Table for storing NextSeq specific run parameters
 class Nextseq(models.Model):
     run_id = models.ForeignKey(
         'Runlog',
@@ -121,7 +125,12 @@ class Nextseq(models.Model):
         return self.run_id_id
 
 
+# Table for storing input values from the frontend. No data is saved to this table.
 class Input(models.Model):
     start_date = models.DateField()
     end_date = models.DateField()
+    run_id = models.CharField(max_length=100, blank=True, null=True)
+    experiment = models.CharField(max_length=100, blank=True, null=True)
+    samples = models.CharField(max_length=100, blank=True, null=True)
+    pipeline = models.CharField(max_length=100, blank=True, null=True)
     

@@ -1,0 +1,51 @@
+{% extends 'db/base.html' %}
+{% block content %}
+
+<!--Search section-->
+<div class="row">
+    <div class="col-sm-1"></div><!--placefiller to centralise content-->
+    <div class="col-sm-5"><!--Left column - description-->
+        <h3>Search</h3><br>
+        <p>Search the Runlog database by worksheet ID, run ID, sample ID or pipeline to output a list of matching runs.</p> 
+        <p>Input your search terms and click 'Search' to start.</p>
+    </div>
+    <div class="col-sm-5"><!--Right column - input form-->
+        <div class="card bg-light" style="width:400px">
+            <div class="card-body">
+                <h5 class="card-title">Enter search terms:</h5><br>
+                <form method="POST" class="post-form">{% csrf_token %}
+                    <table>{{ form.as_table }}</table><br>
+                    <button type="submit" class="save btn btn-sm btn-primary float-right" name="search_input">Search</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<br><hr>
+
+<!--Results section-->
+<h3>Results</h3>
+<table class="table table-sm table-condensed table-hover table-responsive">
+    <thead><!--Results table headers-->
+        <tr>
+            <td width="10%"><b>Worksheet</b></td>
+            <td width="35%"><b>Run ID</b></td>
+            <td width="10%"><b>Pipeline</b></td>
+            <td width="45%"><b>Samples</b></td>
+        </tr>
+    </thead>
+    <tbody><!--loop through runs to make table rows-->
+        {% for run in runs %}
+        <tr>
+            <!-- TO DO: make button to view whole record
+            <td><span class="badge badge-primary">View</button></td>  -->
+            <td width="10%">{{ run.experiment }}</td>
+            <td width="35%">{{ run.run_id }}</td>
+            <td width="10%">{{ run.pipeline }}</td>
+            <td width="45%">{{ run.samples }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
