@@ -12,12 +12,12 @@ This database was a project for my STP Computing for Clinical Scientists (SBI101
 ## Parameters
 
 The database is split into three tables:
-- Runlog: data common to all sequencing runs, regardless of instrument type.
+- **Runlog table**: data common to all sequencing runs, regardless of instrument type.
   - Run ID, worksheet ID, panels, sample IDs
   - Setup and run dates
   - QC metrics - interops and sensitivity data
   - Other data pulled from the samplesheet
-- Miseq/Hiseq/Nextseq tables: data specific to the relevent instrument.
+- **Miseq/Hiseq/Nextseq tables**: data specific to the relevent instrument.
   - Specific data about the sequencer settings 
   - Pulled from the RunParameters.xml file
 
@@ -38,28 +38,37 @@ The database is split into three tables:
 - run add_archive to add all previous runs
   - some runs will throw errors, see file for details
 - add commands in ```scripts/cron.sh``` to cron job to find and add any further runs as they are made
-- host frontend on cluster usign apache - TO DO
+- TO DO: host frontend on cluster usign apache
 
 ### Directory structure
 ```bash
+                                        FUNCTION
 RunlogDB
 |-- runlog
-|   |-- db
+|   |-- db                              
 |   |-- runlog
 |   |-- manage.py
-|   |-- runlogdb.sqlite3
+|   |-- runlogdb.sqlite3                database
 |-- scripts
 |   |-- __pycache__
-|   |-- add_archive.sh
-|   |-- add_nipt.sh
-|-- main.py
+|   |-- add_archive.sh                  Add previous runs
+|   |-- add_nipt.sh                     Search for new NIPT runs and add
+|   |-- add_run.sh                      Add a single run
+|   |-- add_to_db.py                    called by main.py to upload a whole run
+|   |-- cron.sh                         commands to add to cron job
+|   |-- parse_interop.py                parses interops data
+|   |-- parse_runinfo.py                parses runinfo file
+|   |-- parse_runparameters.py          parses runparameter file
+|   |-- parse_samplesheet.py            parses samplesheet
+|   |-- print.sh                        print database to bash terminal
+|-- main.py                             calls all of the parsing and add functions to collect and add data 
 |-- README.md
-|-- runlog_upload_log.txt
-|-- runlogdb-env.yml
+|-- runlog_upload_log.txt               log of all uploads to check for errors
+|-- runlogdb-env.yml                    use to recreate conda environment
 ```
 
 ## Potential upload errors
-There are some common errors when upaloding a run to the database, they are shown below.
+There are some common errors when uploading a run to the database, they are shown below.
 Most commly it is either the samplesheet has been setup incorrectly or the run failed, 
 meaning that the required files aren't present.
 
