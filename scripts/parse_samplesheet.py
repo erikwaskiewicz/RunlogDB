@@ -118,7 +118,7 @@ def parse3(dictionary):
         elif "NGHS-201X" in var:
             out_list += ["TAM"]
         # Currently don't have a better identifier for NIPT
-        elif "cfDNA" in var:
+        elif "cfDNA" in dictionary["Description"]:
             out_list += ["NIPT"]
             experiment = dictionary["Experiment Name"]
             investigator = dictionary["Investigator Name"]
