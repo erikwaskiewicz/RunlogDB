@@ -67,6 +67,16 @@ RunlogDB
 |-- runlogdb-env.yml                    use to recreate conda environment
 ```
 
+## Adding a run
+
+### Any run except NIPT
+`bash /data/diagnostics/apps/RunlogDB/scripts/add_run.sh /data/archive/<instrument>/<run_id> >> runlog_upload_log.txt 2>&1`
+Bash the add_run.sh script with the path to the raw files, the last bit is to add to a text log file, I hadn't worked out how to make python do logging when I wrote this.
+
+### NIPT
+`bash /data/diagnostics/apps/RunlogDB/scripts/add_nipt.sh >> runlog_upload_log.txt 2>&1`
+NIPT runs are on a different server so the upload process is different, there is no need to input the run ID, the script will calculate the last run to be added and add all runs since then.
+
 ## Potential upload errors
 There are some common errors when uploading a run to the database, they are shown below.
 Most commly it is either the samplesheet has been setup incorrectly or the run failed, 
