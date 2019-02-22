@@ -38,7 +38,7 @@ def index(request):
                 # save input dates but don't commit to the database
                 dates = form.save(commit=False)
                 # perform query based on input values
-                runs = Runlog.objects.filter(instrument_date__range=(dates.start_date, dates.end_date)).order_by('-instrument_date')
+                runs = Runlog.objects.filter(instrument_date__range=(dates.start_date, dates.end_date)).order_by('instrument_date')
                 # open empty excel workbook
                 wb = openpyxl.Workbook()
                 panels = ['BRCA', 'CRM', 'CRUK', 'NIPT', 'TAM', 'TruSightCancer', 'TruSightOne']
