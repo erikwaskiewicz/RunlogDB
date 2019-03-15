@@ -7,6 +7,7 @@ Loops through the remaining records and saves each to a new row.
 def tab_other(wb, runs, panels):
     # define headers
     headers = ['Panel', 'Run ID', 'Worksheet', 'Description', 'Setup Date', 'Run Date', 'TAT']
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Setup Date', 'Run Date', 'TAT1', 'TAT2', 'Total TAT', 'Description']
     # get queryset and exclude runs where the panels are in the input list
     qs = runs
     for panel in panels:
@@ -27,17 +28,32 @@ def tab_other(wb, runs, panels):
             obj.pipeline,
             obj.run_id,
             obj.experiment,
-            obj.description2,
+            '', # worksheet date
             obj.setup_date,
             obj.instrument_date,
+            '', # TAT1
+            '', # TAT2
+            '', # Total TAT - this is to preserve column ordering, all three of these are overwritten in the next section
+            obj.description2
         ]
         for col in range(len(row)):
             # loops through list to add each column
             c = ws.cell(row=row_no + 1, column=col + 1)
             c.value = row[col]
+            
         # add custom excel formula to workout working days between start and end dates
-        c = ws.cell(row=row_no + 1, column=len(row) + 1)
+        # TAT1 - worksheet date - setup date
+        c = ws.cell(row=row_no + 1, column=7)
+        c.value = '=NETWORKDAYS(D' + str(n+2) + ',E' + str(n+2) + ',1)'
+
+        #TAT2 - Setup date to run date
+        c = ws.cell(row=row_no + 1, column=8)
         c.value = '=NETWORKDAYS(E' + str(n+2) + ',F' + str(n+2) + ',1)'
+
+        # Total TAT - Worksheet date - run date
+        c = ws.cell(row=row_no + 1, column=9)
+        c.value = '=NETWORKDAYS(D' + str(n+2) + ',F' + str(n+2) + ',1)'
+
     return wb
 
 
@@ -49,7 +65,8 @@ The output is a seperate tab for each panel.
 """
 def tab_panels(wb, runs, panels):
     # define headers
-    headers = ['Panel', 'Run ID', 'Worksheet', 'Setup Date', 'Run Date', 'TAT']
+    #headers = ['Panel', 'Run ID', 'Worksheet', 'Setup Date', 'Run Date', 'TAT']
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Setup Date', 'Run Date', 'TAT1', 'TAT2', 'Total TAT']
     # loop through each of the input panels and create worksheets and a subset of the orginal queryset
     for panel in panels:
         qs = runs.filter(pipeline__contains=panel)
@@ -66,7 +83,8 @@ def tab_panels(wb, runs, panels):
             row = [
                 obj.pipeline,
                 obj.run_id,
-                obj.experiment,                        
+                obj.experiment,
+                '',   # Worksheet date - imported but poorly formatted so cant parse - GTs to manually input
                 obj.setup_date,
                 obj.instrument_date,
             ]
@@ -74,9 +92,20 @@ def tab_panels(wb, runs, panels):
                 # loops through list to add each column
                 c = ws.cell(row=row_no + 1, column=col + 1)
                 c.value = row[col]
+
             # add custom excel formula to workout working days between start and end dates
+            # TAT1 - worksheet date - setup date
             c = ws.cell(row=row_no + 1, column=len(row) + 1)
             c.value = '=NETWORKDAYS(D' + str(n+2) + ',E' + str(n+2) + ',1)'
+
+            #TAT2 - Setup date to run date
+            c = ws.cell(row=row_no + 1, column=len(row) + 2)
+            c.value = '=NETWORKDAYS(E' + str(n+2) + ',F' + str(n+2) + ',1)'
+
+            # Total TAT - Worksheet date - run date
+            c = ws.cell(row=row_no + 1, column=len(row) + 3)
+            c.value = '=NETWORKDAYS(D' + str(n+2) + ',F' + str(n+2) + ',1)'
+
     return wb
 
 
@@ -87,7 +116,7 @@ Loops through the query set and saves each result to a new row.
 """
 def tab_raw(wb, runs):
     # define headers and make new worksheet
-    headers = ['Panel', 'Run ID', 'Worksheet', 'Setup Date', 'Run Date']
+    headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Setup Date', 'Run Date', 'Description']
     ws = wb.create_sheet(title='raw')
     row_no = 0
     # add headers
@@ -102,8 +131,10 @@ def tab_raw(wb, runs):
             obj.pipeline,
             obj.run_id,
             obj.experiment,
+            '', # worksheet date - enter manually
             obj.setup_date,
             obj.instrument_date,
+            obj.description2
         ]
         for col in range(len(row)):
             # loops through list to add each column
