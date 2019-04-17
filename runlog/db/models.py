@@ -133,4 +133,125 @@ class Input(models.Model):
     experiment = models.CharField(max_length=100, blank=True, null=True)
     samples = models.CharField(max_length=100, blank=True, null=True)
     pipeline = models.CharField(max_length=100, blank=True, null=True)
+
+
+
+class SampleMetrics(models.Model):
+    UKW = 'Not Specified'
+    UniqueID = models.CharField(max_length=100, primary_key=True)
+    run_id = models.ForeignKey(
+        'Runlog',
+        on_delete=models.CASCADE,
+    )
+    SampleID = models.CharField(max_length=10)
+    BAIT_SET = models.CharField(max_length=100)
+    GENOME_SIZE = models.BigIntegerField()
+    BAIT_TERRITORY = models.BigIntegerField(blank=True, null=True) 
+    TARGET_TERRITORY = models.BigIntegerField(blank=True, null=True)
+    BAIT_DESIGN_EFFICIENCY = models.BigIntegerField(blank=True, null=True)
+    TOTAL_READS = models.IntegerField(blank=True, null=True)
+    PF_READS = models.IntegerField(blank=True, null=True)
+    PF_UNIQUE_READS = models.IntegerField(blank=True, null=True)
+    PCT_PF_READS = models.IntegerField(blank=True, null=True)
+    PCT_PF_UQ_READS = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PF_UQ_READS_ALIGNED = models.IntegerField(blank=True, null=True)
+    PCT_PF_UQ_READS_ALIGNED = models.IntegerField(blank=True, null=True) 
+    PF_BASES_ALIGNED = models.IntegerField(blank=True, null=True)
+    PF_UQ_BASES_ALIGNED = models.IntegerField(blank=True, null=True)
+    ON_BAIT_BASES = models.IntegerField(blank=True, null=True) 
+    NEAR_BAIT_BASES = models.IntegerField(blank=True, null=True)
+    OFF_BAIT_BASES = models.IntegerField(blank=True, null=True)
+    ON_TARGET_BASES = models.IntegerField(blank=True, null=True)
+    PCT_SELECTED_BASES = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_OFF_BAIT = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    ON_BAIT_VS_SELECTED = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    MEAN_BAIT_COVERAGE = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    MEAN_TARGET_COVERAGE = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    MEDIAN_TARGET_COVERAGE = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    MAX_TARGET_COVERAGE = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_USABLE_BASES_ON_BAIT = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_USABLE_BASES_ON_TARGET = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    FOLD_ENRICHMENT = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    ZERO_CVG_TARGETS_PCT = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_EXC_DUPE = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_EXC_MAPQ = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_EXC_BASEQ = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_EXC_OVERLAP = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_EXC_OFF_TARGET = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    FOLD_80_BASE_PENALTY = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_1X =  models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_2X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_10X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_20X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_30X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_40X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_50X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    PCT_TARGET_BASES_100X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HS_LIBRARY_SIZE = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HS_PENALTY_10X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True) 
+    HS_PENALTY_20X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HS_PENALTY_30X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HS_PENALTY_40X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HS_PENALTY_50X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HS_PENALTY_100X = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    AT_DROPOUT = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    GC_DROPOUT = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HET_SNP_SENSITIVITY = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
+    HET_SNP_Q = models.IntegerField(blank=True, null=True) 
     
+
+
+class FastQC(models.Model):
+
+    UniqueID = models.ForeignKey(
+        'SampleMetrics',
+        on_delete=models.CASCADE,
+    )
+    Read_Group = models.CharField(max_length=50, blank=True, null=True)
+    Lane = models.CharField(max_length=50, blank=True, null=True)
+    PASS = 'PASS'
+    WARN ='WARN'
+    FAIL = 'FAIL'
+    UKW = 'UNKNOWN'
+    fastqcheck_CHOICES = (
+        (PASS, 'PASS'),
+        (WARN, 'WARN'),
+        (FAIL, 'FAIL'),
+    )
+    Basic_Statistics = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Per_base_sequence_quality = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Per_tile_sequence_quality = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Per_sequence_quality_scores = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Per_base_sequence_content = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Per_sequence_GC_content = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Per_base_N_content = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Sequence_Length_Distribution = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Sequence_Duplication_Levels = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Overrepresented_sequences = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Adapter_Content = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+    Kmer_Content = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

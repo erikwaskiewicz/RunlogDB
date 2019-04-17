@@ -1,7 +1,9 @@
 import sqlite3
 
 
-DB = '/Users/erik/Projects/RunlogDB/runlog/runlogdb.sqlite3'
+#DB = '/Users/erik/Projects/RunlogDB/runlog/runlogdb.sqlite3'
+DB = '/export/home/sa/RunlogDB/runlog/runlogdb.sqlite3'
+#DB='/Users/Seemu/RunlogDB/runlog/runlogdb.sqlite3'
 
 def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
     db = sqlite3.connect(DB)
@@ -215,3 +217,170 @@ def nextseq_add(dictionary):
             dictionary["ApplicationVersion"]))
     db.commit()
     db.close()
+
+
+def SampleMetrics_add(hsdict):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute(''' INSERT INTO db_samplemetrics (
+            UniqueID, 
+            run_id_id,
+            SampleID,
+            BAIT_SET,
+            GENOME_SIZE,
+            BAIT_TERRITORY,
+            TARGET_TERRITORY,
+            BAIT_DESIGN_EFFICIENCY,
+            TOTAL_READS,
+            PF_READS,
+            PF_UNIQUE_READS,
+            PCT_PF_READS,
+            PCT_PF_UQ_READS,
+            PF_UQ_READS_ALIGNED,
+            PCT_PF_UQ_READS_ALIGNED,
+            PF_BASES_ALIGNED,
+            PF_UQ_BASES_ALIGNED,
+            ON_BAIT_BASES,
+            NEAR_BAIT_BASES,
+            OFF_BAIT_BASES,
+            ON_TARGET_BASES,
+            PCT_SELECTED_BASES,
+            PCT_OFF_BAIT,
+            ON_BAIT_VS_SELECTED,
+            MEAN_BAIT_COVERAGE,
+            MEAN_TARGET_COVERAGE,
+            MEDIAN_TARGET_COVERAGE,
+            MAX_TARGET_COVERAGE,
+            PCT_USABLE_BASES_ON_BAIT,
+            PCT_USABLE_BASES_ON_TARGET,
+            FOLD_ENRICHMENT,
+            ZERO_CVG_TARGETS_PCT,
+            PCT_EXC_DUPE,
+            PCT_EXC_MAPQ,
+            PCT_EXC_BASEQ,
+            PCT_EXC_OVERLAP,
+            PCT_EXC_OFF_TARGET,
+            FOLD_80_BASE_PENALTY,
+            PCT_TARGET_BASES_1X,
+            PCT_TARGET_BASES_2X,
+            PCT_TARGET_BASES_10X,
+            PCT_TARGET_BASES_20X,
+            PCT_TARGET_BASES_30X,
+            PCT_TARGET_BASES_40X,
+            PCT_TARGET_BASES_50X,
+            PCT_TARGET_BASES_100X,
+            HS_LIBRARY_SIZE,
+            HS_PENALTY_10X,
+            HS_PENALTY_20X,
+            HS_PENALTY_30X,
+            HS_PENALTY_40X,
+            HS_PENALTY_50X,
+            HS_PENALTY_100X,
+            AT_DROPOUT,
+            GC_DROPOUT,
+            HET_SNP_SENSITIVITY,
+            HET_SNP_Q
+            )
+ 
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+            (hsdict["UniqueID"],
+            hsdict["run_id"],
+            hsdict["SampleID"],
+            hsdict["BAIT_SET"],
+            hsdict["GENOME_SIZE"],
+            hsdict["BAIT_TERRITORY"],
+            hsdict["TARGET_TERRITORY"],
+            hsdict["BAIT_DESIGN_EFFICIENCY"],
+            hsdict["TOTAL_READS"],
+            hsdict["PF_READS"],
+            hsdict["PF_UNIQUE_READS"],
+            hsdict["PCT_PF_READS"],
+            hsdict["PCT_PF_UQ_READS"],
+            hsdict["PF_UQ_READS_ALIGNED"],
+            hsdict["PCT_PF_UQ_READS_ALIGNED"],
+            hsdict["PF_BASES_ALIGNED"],
+            hsdict["PF_UQ_BASES_ALIGNED"],
+            hsdict["ON_BAIT_BASES"],
+            hsdict["NEAR_BAIT_BASES"],
+            hsdict["OFF_BAIT_BASES"],
+            hsdict["ON_TARGET_BASES"],
+            hsdict["PCT_SELECTED_BASES"],
+            hsdict["PCT_OFF_BAIT"],
+            hsdict["ON_BAIT_VS_SELECTED"],
+            hsdict["MEAN_BAIT_COVERAGE"],
+            hsdict["MEAN_TARGET_COVERAGE"],
+            hsdict["MEDIAN_TARGET_COVERAGE"],
+            hsdict["MAX_TARGET_COVERAGE"],
+            hsdict["PCT_USABLE_BASES_ON_BAIT"],
+            hsdict["PCT_USABLE_BASES_ON_TARGET"],
+            hsdict["FOLD_ENRICHMENT"],
+            hsdict["ZERO_CVG_TARGETS_PCT"],
+            hsdict["PCT_EXC_DUPE"],
+            hsdict["PCT_EXC_MAPQ"],
+            hsdict["PCT_EXC_BASEQ"],
+            hsdict["PCT_EXC_OVERLAP"],
+            hsdict["PCT_EXC_OFF_TARGET"],
+            hsdict["FOLD_80_BASE_PENALTY"],
+            hsdict["PCT_TARGET_BASES_1X"],
+            hsdict["PCT_TARGET_BASES_2X"],
+            hsdict["PCT_TARGET_BASES_10X"],
+            hsdict["PCT_TARGET_BASES_20X"],
+            hsdict["PCT_TARGET_BASES_30X"],
+            hsdict["PCT_TARGET_BASES_40X"],
+            hsdict["PCT_TARGET_BASES_50X"],
+            hsdict["PCT_TARGET_BASES_100X"],
+            hsdict["HS_LIBRARY_SIZE"],
+            hsdict["HS_PENALTY_10X"],
+            hsdict["HS_PENALTY_20X"],
+            hsdict["HS_PENALTY_30X"],
+            hsdict["HS_PENALTY_40X"],
+            hsdict["HS_PENALTY_50X"],
+            hsdict["HS_PENALTY_100X"],
+            hsdict["AT_DROPOUT"],
+            hsdict["GC_DROPOUT"],
+            hsdict["HET_SNP_SENSITIVITY"],
+            hsdict["HET_SNP_Q"]))
+    db.commit()
+    db.close()
+
+def Fastqc_add(dictionary):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute(''' INSERT INTO db_fastqc (
+            UniqueID_id,
+            Read_Group,
+            Lane,
+            Basic_Statistics,
+            Per_base_sequence_quality,
+            Per_tile_sequence_quality,
+            Per_sequence_quality_scores,
+            Per_base_sequence_content,
+            Per_sequence_GC_content,
+            Per_base_N_content,
+            Sequence_Length_Distribution,
+            Sequence_Duplication_Levels,
+            Overrepresented_sequences,
+            Adapter_Content,
+            Kmer_Content
+            )
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+           (dictionary["UniqueID"],
+            dictionary["Read_Group"],
+            dictionary["Lane"],
+            dictionary["Basic Statistics"],
+            dictionary["Per base sequence quality"],
+            dictionary["Per tile sequence quality"],
+            dictionary["Per sequence quality scores"],
+            dictionary["Per base sequence content"],
+            dictionary["Per sequence GC content"],
+            dictionary["Per base N content"],
+            dictionary["Sequence Length Distribution"],
+            dictionary["Sequence Duplication Levels"],
+            dictionary["Overrepresented sequences"],
+            dictionary["Adapter Content"],
+            dictionary["Kmer Content"]))
+    db.commit() 
+    db.close()
+
+
+

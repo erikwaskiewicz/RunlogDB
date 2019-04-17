@@ -1,6 +1,6 @@
 #!/bin/bash
-
-DB="/Users/erik/Projects/RunlogDB/runlog/runlogdb.sqlite3"
+DB='/Users/Seemu/RunlogDB/runlog/runlogdb.sqlite3'
+#DB="/Users/erik/Projects/RunlogDB/run/runlogdb.sqlite3"
 
 echo ""
 echo "Runlog table"
@@ -22,3 +22,7 @@ echo "NextSeq table"
 echo "----------------"
 sqlite3 -column -header $DB "select * from db_nextseq"
 
+echo ""
+echo "Sample table"
+echo "----------------"
+sqlite3 -column -header $DB "select * from db_SampleMetrics"
