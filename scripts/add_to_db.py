@@ -38,7 +38,7 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             diagnostic_run
             )
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
-           (runinfo_dict["Id"],
+            (runinfo_dict["Id"],
             runinfo_dict["Instrument"],
             runinfo_dict["Date"],
             runinfo_dict["num_cycles1"],
@@ -51,11 +51,11 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             samplesheet_dict["Assay"],
             samplesheet_dict["Description"],
             samplesheet_dict["Chemistry"],
-            samplesheet_dict["Plates"],
-            samplesheet_dict["Description2"],
-            samplesheet_dict["Samples"],
-            samplesheet_dict["I7"],
-            samplesheet_dict["I5"],
+            #samplesheet_dict["Plates"],
+            #samplesheet_dict["Description2"],
+            #samplesheet_dict["Samples"],
+            #samplesheet_dict["I7"],
+            #samplesheet_dict["I5"],
             samplesheet_dict["Pipeline"],
             interop_dict["Percent Q30"],
             interop_dict["Cluster density"],
@@ -68,6 +68,61 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
     db.commit()
     db.close()
 
+
+
+def worksheetinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute(''' INSERT INTO db_worksheet (
+            ws_id,
+            run_id,
+            pipelineName,
+            pipelineVersion,
+            panel
+            )
+        VALUES(?, ?, ?, ?, ?) ''',
+            (samplesheet_dict["Plates"],
+            runinfo_dict["Id"],
+            #?new sample sheet parser
+            #?new sample sheet parser
+            #?new sample sheet parser
+
+            ))
+    db.commit()
+    db.close()
+
+
+
+def sampleinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
+    db = sqlite3.connect(DB)
+    cursor = db.cursor()
+    cursor.execute(''' INSERT INTO db_sample (
+        UniqueID,
+        ws_id,
+        run_id,
+        sample_id,
+        I7,
+        I5, 
+        description,
+        sample_well,
+        sample_project,
+        sex
+        )
+    VALUES(?, ?, ?, ?, ?, ?, ?) ''',
+        ( runinfo_dict["Id"] + "_" + samplesheet_dict["Samples"],
+        samplesheet_dict["Plates"],
+        runinfo_dict["Id"],
+        samplesheet_dict["Samples"],
+        samplesheet_dict["I7"],
+        samplesheet_dict["I5"],
+        samplesheet_dict["Description2"],
+        #?
+        #?
+        #?
+        ))
+    db.commit()
+    db.close()
+    
 
 def miseq_add(dictionary):
     db = sqlite3.connect(DB)
@@ -218,8 +273,7 @@ def nextseq_add(dictionary):
     db.commit()
     db.close()
 
-
-def SampleMetrics_add(hsdict):
+def SampleMetrics_add(hsdict, runinfo_dict, samplesheet_dict):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
     cursor.execute(''' INSERT INTO db_samplemetrics (
@@ -283,7 +337,7 @@ def SampleMetrics_add(hsdict):
             )
  
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
-            (hsdict["UniqueID"],
+            (runinfo_dict["Id"] + "_" + samplesheet_dict["Samples"],
             hsdict["run_id"],
             hsdict["SampleID"],
             hsdict["BAIT_SET"],
@@ -343,7 +397,12 @@ def SampleMetrics_add(hsdict):
     db.commit()
     db.close()
 
-def Fastqc_add(dictionary):
+
+
+
+
+
+def Fastqc_add(dictionary, runinfo_dict, samplesheet_dict):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
     cursor.execute(''' INSERT INTO db_fastqc (
@@ -364,7 +423,7 @@ def Fastqc_add(dictionary):
             Kmer_Content
             )
         VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
-           (dictionary["UniqueID"],
+           (runinfo_dict["Id"] + "_" + samplesheet_dict["Samples"],
             dictionary["Read_Group"],
             dictionary["Lane"],
             dictionary["Basic Statistics"],

@@ -10,7 +10,7 @@ class Runlog(models.Model):
     samplesheet_date = models.CharField(max_length=100, blank=True, null=True)
     investigator = models.CharField(max_length=100, null=True)
     experiment = models.CharField(max_length=100, null=True)
-    plates = models.CharField(max_length=200, null=True)
+    #plates = models.CharField(max_length=200, null=True)
     pipeline = models.CharField(max_length=200, null=True)
     num_cycles1 = models.IntegerField()
     num_cycles2 = models.IntegerField()
@@ -19,10 +19,10 @@ class Runlog(models.Model):
     assay = models.CharField(max_length=100, null=True)
     chemistry = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=200, null=True)
-    description2 = models.TextField(null=True)
-    samples = models.TextField(null=True)
-    I7 = models.TextField(null=True)
-    I5 = models.TextField(null=True)
+    #description2 = models.TextField(null=True)
+    #samples = models.TextField(null=True)
+    #I7 = models.TextField(null=True)
+    #I5 = models.TextField(null=True)
     percent_Q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     cluster_density = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     percent_pf = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
@@ -36,6 +36,80 @@ class Runlog(models.Model):
     comments = models.TextField(blank=True, null=True)
     def __str__(self):
         return self.run_id
+
+
+
+class Worksheet(models.Model):
+    ws_id = models.CharField(max_length=200, primary_key=True) #"Sample_Plate":"18-9110",
+    run_id = models.ForeignKey(
+        'Runlog',
+        on_delete=models.CASCADE,
+    )
+    pipelineName = models.CharField(max_length=200, null=True)
+    pipelineVersion = models.CharField(max_length=200, null=True)
+    panel = models.CharField(max_length=200, null=True)
+    
+    def pipeline (self):
+        samples = SampleRun.objects.filter(ws_id= self)
+        panels_list = []
+        for sample in samples:
+            panel = sample.pipeline()   #pipeline function called from the Sample table is defined in the WS sample(s) variable
+            panels_list.append(panel)
+        panel_unique = []
+        for panel in panel_list:
+            if panel not in panel_unique:
+                panel_unique.append(panel)
+            if panel == "":
+                panel_unique.remove(panel)
+
+        panels = ",".join(panels)
+
+        return panels 
+           
+
+
+class SampleRun(models.Model):
+    UniqueID = models.CharField(max_length=100, primary_key=True)
+    ws_id =models.ForeignKey(
+        'Worksheet',
+        on_delete=models.CASCADE,
+    )
+    run_id = models.ForeignKey(
+        'Runlog',
+        on_delete=models.CASCADE,
+    )
+    sample_id = models.TextField(null=True)
+    I7 = models.TextField(null=True) #"I7_Index_ID":"Bc1",
+    I5 = models.TextField(null=True) #"index":"ATCACG"
+    description = models.TextField(null=True) #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
+    sample_well = IntegerFeild()
+    sample_project = #"Sample_Project":"",
+    sex = models.Charfeild(max_length=10, null=True)
+
+
+
+    def pipeline(self):
+
+        panel_list = self.description.split(',')
+        for panel in panel_list:
+            if "NGHS-101X-WCB" in var:
+                return "WCB"
+            elif "NGHS-101X" in var:
+                return "CRM"
+            elif "NGHS-102X" in var:
+                return "BRCA"
+            elif "CRUK" in var:
+                return "CRUK"
+            elif "TruSightCancer" in var:
+                return "TruSightCancer"
+            elif "TruSightOne" in var:
+                return "TruSightOne"
+            elif "NGHS-201X" in var:
+                return "TAM"
+            # Currently don't have a better identifier for NIPT
+            elif "cfDNA" in Runlog.description:
+                return "NIPT"
+
 
 
 # Table for storing MiSeq specific run parameters
@@ -137,8 +211,11 @@ class Input(models.Model):
 
 
 class SampleMetrics(models.Model):
+    UniqueID = models.ForeignKey(
+        'Sample',
+        on_delete=models.CASCADE,
+    )
     UKW = 'Not Specified'
-    UniqueID = models.CharField(max_length=100, primary_key=True)
     run_id = models.ForeignKey(
         'Runlog',
         on_delete=models.CASCADE,
@@ -204,7 +281,7 @@ class SampleMetrics(models.Model):
 class FastQC(models.Model):
 
     UniqueID = models.ForeignKey(
-        'SampleMetrics',
+        'Sample',
         on_delete=models.CASCADE,
     )
     Read_Group = models.CharField(max_length=50, blank=True, null=True)
