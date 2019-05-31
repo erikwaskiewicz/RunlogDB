@@ -16,6 +16,8 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             num_cycles2, 
             investigator, 
             experiment, 
+            read1, 
+            read2,
             samplesheet_date, 
             workflow, 
             application, 
@@ -37,7 +39,7 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             percent_aligned,
             diagnostic_run
             )
-        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
+        VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ''',
             (runinfo_dict["Id"],
             runinfo_dict["Instrument"],
             runinfo_dict["Date"],
@@ -45,6 +47,8 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             runinfo_dict["num_cycles2"],
             samplesheet_dict["Investigator Name"],
             samplesheet_dict["Experiment Name"],
+            runinfo_dict["read1"],
+            runinfo_dict["read2"],
             samplesheet_dict["Date"],
             samplesheet_dict["Workflow"],
             samplesheet_dict["Application"],
@@ -68,9 +72,25 @@ def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
     db.commit()
     db.close()
 
+'''
+Header":{
+    "IEMFileVersion":"4",
+    "Investigator_Name":"Hoi Ping Weeks-NHS",
+    "Experiment_Name":"18-9110_18-9118",
+    "Workflow":"GenerateFASTQ",
+    "Application":"FASTQ Only",
+    "Chemistry":"Default"
+  "Reads":{
+    "read1":"151",
+    "read2":"151"
 
+note: these are pulled out from samplesheet- does it need to be added to database when already pulled?
 
-def worksheetinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
+'''
+
+#------------------------------------------------------------------------------------------------------------------
+
+def worksheetinfo_add(runinfo_dict, samplesheet_dict, ws_dict):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
     cursor.execute(''' INSERT INTO db_worksheet (
@@ -81,11 +101,12 @@ def worksheetinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
             panel
             )
         VALUES(?, ?, ?, ?, ?) ''',
-            (samplesheet_dict["Plates"],
-            runinfo_dict["Id"],
-            #?new sample sheet parser
-            #?new sample sheet parser
-            #?new sample sheet parser
+            (samplesheet_dict["Plates"], #duplicate
+            runinfo_dict["Id"],            
+            ws_dict["Sample_Plate"],    #duplicate 
+            ws_dict["pipelineName"],
+            ws_dict["pipelineVersion"],
+            ws_dict["panel"]
 
             ))
     db.commit()
@@ -93,7 +114,7 @@ def worksheetinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
 
 
 
-def sampleinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
+def sampleinfo_add(runinfo_dict, samplesheet_dict, sample_dict):
     db = sqlite3.connect(DB)
     cursor = db.cursor()
     cursor.execute(''' INSERT INTO db_sample (
@@ -116,9 +137,9 @@ def sampleinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
         samplesheet_dict["I7"],
         samplesheet_dict["I5"],
         samplesheet_dict["Description2"],
-        #?
-        #?
-        #?
+        sample_dict["Sample_Well"],
+        sample_dict["Sample_Project"],
+        sample_dict["sex"]
         ))
     db.commit()
     db.close()

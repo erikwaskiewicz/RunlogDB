@@ -10,6 +10,8 @@ class Runlog(models.Model):
     samplesheet_date = models.CharField(max_length=100, blank=True, null=True)
     investigator = models.CharField(max_length=100, null=True)
     experiment = models.CharField(max_length=100, null=True)
+    read1 = models.IntegerField()
+    read2 = models.IntegerField()
     #plates = models.CharField(max_length=200, null=True)
     pipeline = models.CharField(max_length=200, null=True)
     num_cycles1 = models.IntegerField()
@@ -50,7 +52,7 @@ class Worksheet(models.Model):
     panel = models.CharField(max_length=200, null=True)
     
     def pipeline (self):
-        samples = SampleRun.objects.filter(ws_id= self)
+        samples = SampleRun.objects.filter(ws_id= self) #forgot what the code is doing here - ask erik 
         panels_list = []
         for sample in samples:
             panel = sample.pipeline()   #pipeline function called from the Sample table is defined in the WS sample(s) variable
@@ -83,7 +85,7 @@ class SampleRun(models.Model):
     I5 = models.TextField(null=True) #"index":"ATCACG"
     description = models.TextField(null=True) #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
     sample_well = IntegerFeild()
-    sample_project = #"Sample_Project":"",
+    sample_project = models.Charfeild(max_length=50, null=True)  #"Sample_Project":"",
     sex = models.Charfeild(max_length=10, null=True)
 
 
