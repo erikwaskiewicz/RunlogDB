@@ -117,6 +117,10 @@ def parse3(dictionary):
             out_list += ["TruSightOne"]
         elif "NGHS-201X" in var:
             out_list += ["TAM"]
+        elif "TruSightMyeloid" in var:
+            out_list += ["TruSightMyeloid"]
+        elif "RochePanCancer" in var:
+            out_list += ["RochePanCancer"]
         # Currently don't have a better identifier for NIPT
         elif "cfDNA" in dictionary["Description"]:
             out_list += ["NIPT"]

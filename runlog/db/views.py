@@ -41,7 +41,7 @@ def index(request):
                 runs = Runlog.objects.filter(instrument_date__range=(dates.start_date, dates.end_date)).order_by('instrument_date', 'experiment')
                 # open empty excel workbook
                 wb = openpyxl.Workbook()
-                panels = ['BRCA', 'CRM', 'CRUK', 'NIPT', 'TAM', 'TruSightCancer', 'TruSightOne']
+                panels = ['BRCA', 'CRM', 'CRUK', 'NIPT', 'TAM', 'TruSightCancer', 'TruSightOne', 'TruSightMyeloid', 'RochePanCancer']
                 # Fill in raw data tab, panels tab and others tab
                 tab_other(wb, runs, panels)
                 tab_panels(wb, runs, panels)
