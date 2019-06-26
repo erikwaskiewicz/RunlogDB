@@ -8,7 +8,7 @@ run_folder=$1
 
 # add run
 echo -e $(date) "\tAdding $run_folder"
-python3.6 ~/Projects/RunlogDB/main.py $run_folder
+python3.6 /data/diagnostics/apps/RunlogDB/RunlogDB-0.1.1/main.py $run_folder
 echo "Done."
 echo "----------------------------------------------------------------------------------------------------"
 

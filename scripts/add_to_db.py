@@ -1,7 +1,7 @@
 import sqlite3
 
 
-DB = '/Users/erik/Projects/RunlogDB/runlog/runlogdb.sqlite3'
+DB = '/data/diagnostics/apps/RunlogDB/RunlogDB-0.1.1/runlog/runlogdb.sqlite3'
 
 def runinfo_add(runinfo_dict, samplesheet_dict, interop_dict):
     db = sqlite3.connect(DB)
