@@ -21,6 +21,9 @@ run_folder = sys.argv[1]
 # ----------------------------------------------------------------------------------------------------
 # PARSE RUNINFO
 
+# TODO: Turn runinfo into json and edit parser to return dict of what we want - run_id, instrument and run date, num of indexes and lengths of index/reads
+
+
 # Create empty runinfo dictionary and define parameters to extract from RunInfo
 runinfo_dict = {}
 runinfo_values = [["Id", "get"], 
@@ -31,28 +34,15 @@ runinfo_values = [["Id", "get"],
 for item in runinfo_values:
     parse_runinfo.parse1(run_folder, runinfo_dict, item[0], item[1])
 
-
-'''
-import json 
-
-with open('/users/seemuali/runlog_resources/output.json') as file:
-    output_dict = json.load(file)
-    file.close()
-
-    for key, val in output_dict["Header"].items():
-            runinfo_dict[key] = val
-
-        for key, val in output_dict["Reads"].items():
-            runinfo_dict[key]= val           
-'''
-
-
 # number of cycles
 parse_runinfo.parse2(run_folder, runinfo_dict)
 
 
 # ----------------------------------------------------------------------------------------------------
 # PARSE SAMPLESHEET
+
+# TODO: Turn samplesheet to json and parse
+
 
 # create empty dictionary and define parameters to extract
 samplesheet_dict = {}
@@ -70,6 +60,12 @@ import json
 with open('/users/seemuali/runlog_resources/output.json') as file:
     output_dict = json.load(file)
     file.close()
+
+    for key, val in output_dict["Header"].items():
+        runinfo_dict[key] = val
+
+    for key, val in output_dict["Reads"].items():
+        runinfo_dict[key]= val 
     
     ws_dict = {}
     sample_dict = {}
@@ -113,6 +109,9 @@ add_to_db.runinfo_add(runinfo_dict, samplesheet_dict, interop_dict)
 
 # ----------------------------------------------------------------------------------------------------
 # PARSE RUNPARAMETERS
+
+# TODO - Turn into JSON and move one step up
+
 
 # hiseq
 if parse_runparameters.instrument_type(run_folder) == "HiSeq":

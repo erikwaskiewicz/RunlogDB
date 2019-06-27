@@ -1,127 +1,87 @@
 from django.db import models
 
 # Table for storing information common to all NGS runs, regardless of instrument type
-class Runlog(models.Model):
+class Run(models.Model):
     run_id = models.CharField(max_length=100, primary_key=True)
-    diagnostic_run = models.BooleanField()
+    worksheet = models.ManyToManyField('Worksheet')
     instrument = models.CharField(max_length=100)
+
     instrument_date = models.DateField()
     setup_date = models.DateField(blank=True, null=True)
     samplesheet_date = models.CharField(max_length=100, blank=True, null=True)
+
     investigator = models.CharField(max_length=100, null=True)
     experiment = models.CharField(max_length=100, null=True)
-    worksheet = models.ManyToManyField('Worksheet')
+    workflow = models.CharField(max_length=100, null=True)
+    application = models.CharField(max_length=100, null=True)
+    assay = models.CharField(max_length=100, null=True)
+    chemistry = models.CharField(max_length=100, null=True)
+    description = models.CharField(max_length=200, null=True)
 
-#    read1 = models.IntegerField()
-#    read2 = models.IntegerField()
-#    #plates = models.CharField(max_length=200, null=True)
-#    pipeline = models.CharField(max_length=200, null=True)
-#    num_cycles1 = models.IntegerField()
-#    num_cycles2 = models.IntegerField()
-#    workflow = models.CharField(max_length=100, null=True)
-#    application = models.CharField(max_length=100, null=True)
-#    assay = models.CharField(max_length=100, null=True)
-#    chemistry = models.CharField(max_length=100, null=True)
-#    description = models.CharField(max_length=200, null=True)
-#    #description2 = models.TextField(null=True)
-#    #samples = models.TextField(null=True)
-#    #I7 = models.TextField(null=True)
-#    #I5 = models.TextField(null=True)
-#    percent_Q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#    cluster_density = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
-#    percent_pf = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#    phasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#    prephasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#    error_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#    percent_aligned = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-#    sensitivity = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-#    sensitivity_lower_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-#    sensitivity_upper_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-#    comments = models.TextField(blank=True, null=True)
-#    def __str__(self):
-#        return self.run_id
+    num_indexes = models.IntegerField()
+    length_read1 = models.IntegerField()
+    length_read2 = models.IntegerField(null=True)
+    length_index1 = models.IntegerField()
+    length_index2 = models.IntegerField(null=True)
+
+    percent_Q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    cluster_density = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    percent_pf = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    phasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    prephasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    error_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    percent_aligned = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    sensitivity = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    sensitivity_lower_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    sensitivity_upper_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+
+    diagnostic_run = models.BooleanField()
+    comments = models.TextField(blank=True, null=True)
+
+    #raw_runinfo_json
+    #raw_runparameters_json
+    #raw_samplesheet_json + functions to extract data
+
+    # instrument type?? make instruments into seperate class??
+
+    def __str__(self):
+        return self.run_id
 
 
 class Worksheet(models.Model):
-    ws_id = models.CharField(max_length=200, primary_key=True) #"Sample_Plate":"18-9110",
-
+    ws_id = models.CharField(max_length=200, primary_key=True)     #"Sample_Plate":"18-9110",
     samples = models.ManyToManyField('Sample')
+
     pipelineName = models.CharField(max_length=200, null=True)
     pipelineVersion = models.CharField(max_length=200, null=True)
     panel = models.CharField(max_length=200, null=True)
-    
-    '''
-    def pipeline (self):
-        samples = SampleRun.objects.filter(ws_id= self) #forgot what the code is doing here - ask erik 
-        panels_list = []
-        for sample in samples:
-            panel = sample.pipeline()   #pipeline function called from the Sample table is defined in the WS sample(s) variable
-            panels_list.append(panel)
-        panel_unique = []
-        for panel in panel_list:
-            if panel not in panel_unique:
-                panel_unique.append(panel)
-            if panel == "":
-                panel_unique.remove(panel)
 
-        panels = ",".join(panels)
-
-        return panels
-    '''
-#run_id = models.ForeignKey(
-#    'Runlog',
-#    on_delete=models.CASCADE,
-#)           
+    def __str__(self):
+        return self.ws_id
 
 
 class Sample(models.Model):
     unique_id = models.CharField(max_length=100, primary_key=True) #run+ws+sample ids
     sample_id = models.TextField(null=True)
-    I7 = models.TextField(null=True) #"I7_Index_ID":"Bc1",
-    I5 = models.TextField(null=True) #"index":"ATCACG"
-    description = models.TextField(null=True) #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
-    sample_well = models.IntegerField()
-    sample_project = models.CharField(max_length=50, null=True)  #"Sample_Project":"",
+
+    description = models.TextField(null=True)                      #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
     sex = models.CharField(max_length=10, null=True)
 
+    I5_name = models.TextField(null=True)                               #"I5_Index_ID":"Bc1",
+    I5_seq = models.TextField(null=True)                               #"index2":"ATCACG"
+    I7_name = models.TextField(null=True)                               #"I7_Index_ID":"Bc1",
+    I7_seq = models.TextField(null=True)                               #"index":"ATCACG"
+    sample_well = models.IntegerField()
+    sample_project = models.CharField(max_length=50, null=True)    #"Sample_Project":"",  usually empty-remove????
 
-    '''
-    def pipeline(self):
-
-        panel_list = self.description.split(',')
-        for panel in panel_list:
-            if "NGHS-101X-WCB" in var:
-                return "WCB"
-            elif "NGHS-101X" in var:
-                return "CRM"
-            elif "NGHS-102X" in var:
-                return "BRCA"
-            elif "CRUK" in var:
-                return "CRUK"
-            elif "TruSightCancer" in var:
-                return "TruSightCancer"
-            elif "TruSightOne" in var:
-                return "TruSightOne"
-            elif "NGHS-201X" in var:
-                return "TAM"
-            # Currently don't have a better identifier for NIPT
-            elif "cfDNA" in Runlog.description:
-                return "NIPT"
-    '''
-#ws_id =models.ForeignKey(
-#    'Worksheet',
-#    on_delete=models.CASCADE,
-#)
-#run_id = models.ForeignKey(
-#    'Runlog',
-#    on_delete=models.CASCADE,
-#)
+    def __str__(self):
+        return self.sample_id
 
 
 # Table for storing MiSeq specific run parameters
 class Miseq(models.Model):
     run_id = models.ForeignKey(
-        'Runlog',
+        'Run',
         on_delete=models.CASCADE,
     )
     MCS_version = models.CharField(max_length=100)
@@ -142,7 +102,7 @@ class Miseq(models.Model):
 # Table for storing HiSeq specific run parameters
 class Hiseq(models.Model):
     run_id = models.ForeignKey(
-        'Runlog',
+        'Run',
         on_delete=models.CASCADE,
     )
     workflow_type = models.CharField(max_length=100)
@@ -171,7 +131,7 @@ class Hiseq(models.Model):
 # Table for storing NextSeq specific run parameters
 class Nextseq(models.Model):
     run_id = models.ForeignKey(
-        'Runlog',
+        'Run',
         on_delete=models.CASCADE,
     )
     instrument_id = models.CharField(max_length=100)
@@ -205,14 +165,7 @@ class Nextseq(models.Model):
         return self.run_id_id
 
 
-# Table for storing input values from the frontend. No data is saved to this table.
-class Input(models.Model):
-    start_date = models.DateField()
-    end_date = models.DateField()
-    run_id = models.CharField(max_length=100, blank=True, null=True)
-    experiment = models.CharField(max_length=100, blank=True, null=True)
-    samples = models.CharField(max_length=100, blank=True, null=True)
-    pipeline = models.CharField(max_length=100, blank=True, null=True)
+
 
 
 '''
@@ -282,10 +235,7 @@ class SampleMetrics(models.Model):
     HET_SNP_SENSITIVITY = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
     HET_SNP_Q = models.IntegerField(blank=True, null=True) 
     
-
-
 class FastQC(models.Model):
-
     UniqueID = models.ForeignKey(
         'Sample',
         on_delete=models.CASCADE,
@@ -315,26 +265,3 @@ class FastQC(models.Model):
     Kmer_Content = models.CharField(max_length=4, choices=fastqcheck_CHOICES, blank=True, default=UKW )
  
 '''
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

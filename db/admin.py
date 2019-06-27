@@ -1,11 +1,15 @@
 from django.contrib import admin
-from .models import Runlog, Nextseq, Hiseq, Miseq       #, SampleMetrics, FastQC
+from .models import Run, Nextseq, Hiseq, Miseq, Worksheet, Sample       #, SampleMetrics, FastQC
 
 
 # Register your models here.
-class RunlogAdmin(admin.ModelAdmin):
+class RunAdmin(admin.ModelAdmin):
     list_display = ('run_id', 'experiment', 'instrument_date', 'samplesheet_date')   #'pipeline', 
-admin.site.register(Runlog, RunlogAdmin)
+admin.site.register(Run, RunAdmin)
+
+admin.site.register(Worksheet)
+
+admin.site.register(Sample)
 
 admin.site.register(Nextseq)
 

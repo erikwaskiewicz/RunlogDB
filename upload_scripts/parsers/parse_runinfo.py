@@ -8,14 +8,14 @@ def get_variables(run_folder):
     if os.path.isfile(runinfo_path) is False:
         exit("ERROR  Could not open file " + runinfo_path)
     runinfo_tree = ET.parse(runinfo_path)
-    global runinfo
     runinfo = runinfo_tree.getroot()
+    return runinfo
 
 
 def parse1(run_folder, dictionary, runinfo_value, value_type):
     """Parses data within RunInfo.xml file. Data must be within the terms RunInfo>Run.
        get retrieves data within an xml header, find retrieves data within between the xml headers."""
-    get_variables(run_folder)
+    runinfo = get_variables(run_folder)
     for runinfo_parameter in runinfo.iter("Run"):
         if runinfo_value == "Date":
             if runinfo_parameter.find(runinfo_value) is not None:
