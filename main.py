@@ -12,7 +12,7 @@ main.py
 
 # Import scripts
 from scripts import add_to_db, parse_interop, parse_runinfo, parse_runparameters, parse_samplesheet
-import sys
+import sys json 
 
 # Load run folder
 run_folder = sys.argv[1]
@@ -31,6 +31,22 @@ runinfo_values = [["Id", "get"],
 for item in runinfo_values:
     parse_runinfo.parse1(run_folder, runinfo_dict, item[0], item[1])
 
+
+'''
+import json 
+
+with open('/users/seemuali/runlog_resources/output.json') as file:
+    output_dict = json.load(file)
+    file.close()
+
+    for key, val in output_dict["Header"].items():
+            runinfo_dict[key] = val
+
+        for key, val in output_dict["Reads"].items():
+            runinfo_dict[key]= val           
+'''
+
+
 # number of cycles
 parse_runinfo.parse2(run_folder, runinfo_dict)
 
@@ -47,6 +63,26 @@ samplesheet_values2 = [["Plates", "Sample_Plate"],
                        ["Samples", "Sample_ID"], 
                        ["I7", "I7_Index_ID"], 
                        ["I5", "I5_Index_ID"]]
+
+'''
+import json 
+
+with open('/users/seemuali/runlog_resources/output.json') as file:
+    output_dict = json.load(file)
+    file.close()
+    
+    ws_dict = {}
+    sample_dict = {}
+ 
+    for key, val in output_dict["Data"].items():
+        ws_dict = val
+        add_to_db.worksheetinfo_add(ws_dict)
+        for key, val in (ws_dict["samples"].items()):
+            sample_dict = val
+            sample_dict["sample_id"]= key
+            add_to_db.sampleinfo_add(sample_dict)          
+'''
+
 
 # data from samplesheet values array
 for item in samplesheet_values1:

@@ -27,8 +27,6 @@ dependencies:
   - wheel=0.31.0=py36_0
   - xz=5.2.3=0
   - zlib=1.2.11=h470a237_3
-  - libgfortran=3.0.0=1
   - pip:
     - interop==1.1.4
-prefix: /share/apps/anaconda2/envs/runlogdb-env
-
+prefix: /share/apps/anaconda2/envs/runlo

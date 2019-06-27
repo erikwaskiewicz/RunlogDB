@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Runlog, Nextseq, Hiseq, Miseq, Input
+from .models import Runlog, Nextseq, Hiseq, Miseq, SampleMetrics, FastQC
 
 
 # Register your models here.
@@ -13,4 +13,7 @@ admin.site.register(Hiseq)
 
 admin.site.register(Miseq)
 
-admin.site.register(Input)
+admin.site.register(SampleMetrics)
+
+admin.site.register(FastQC)
+
