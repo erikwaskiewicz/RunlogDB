@@ -1,10 +1,28 @@
 from django.db import models
+import json
 
-# Table for storing information common to all NGS runs, regardless of instrument type
+class Sample(models.Model):
+    sample_id = models.CharField(max_length=100, primary_key=True)
+
+    def __str__(self):
+        return self.sample_id
+
+
+class Instrument(models.Model):
+    instrument_id = models.CharField(max_length=100, primary_key=True)
+    instrument_type = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.instrument_id
+
+
 class Run(models.Model):
+    """
+    Table for storing information common to all NGS runs, regardless of instrument type
+    """
     run_id = models.CharField(max_length=100, primary_key=True)
-    worksheet = models.ManyToManyField('Worksheet')
-    instrument = models.CharField(max_length=100)
+    worksheets = models.ManyToManyField('Worksheet')
+    instrument = models.ForeignKey('Instrument', on_delete=models.CASCADE)
 
     instrument_date = models.DateField()
     setup_date = models.DateField(blank=True, null=True)
@@ -18,151 +36,70 @@ class Run(models.Model):
     chemistry = models.CharField(max_length=100, null=True)
     description = models.CharField(max_length=200, null=True)
 
-    num_indexes = models.IntegerField()
+    num_reads = models.IntegerField()
     length_read1 = models.IntegerField()
     length_read2 = models.IntegerField(null=True)
+    num_indexes = models.IntegerField()
     length_index1 = models.IntegerField()
     length_index2 = models.IntegerField(null=True)
 
-    percent_Q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    percent_q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     cluster_density = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     percent_pf = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     phasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     prephasing = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     error_rate = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     percent_aligned = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    sensitivity = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    sensitivity_lower_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    sensitivity_upper_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    #sensitivity = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    #sensitivity_lower_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    #sensitivity_upper_95ci = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
 
     diagnostic_run = models.BooleanField()
     comments = models.TextField(blank=True, null=True)
 
-    #raw_runinfo_json
-    #raw_runparameters_json
-    #raw_samplesheet_json + functions to extract data
-
-    # instrument type?? make instruments into seperate class??
+    raw_runinfo_json = models.TextField()
+    raw_runparameters_json = models.TextField()
+    raw_samplesheet_json = models.TextField()
 
     def __str__(self):
         return self.run_id
 
+    def runinfo_json(self):
+        # turn textfield into json object
+        return json.loads(self.raw_runinfo_json)
+
 
 class Worksheet(models.Model):
     ws_id = models.CharField(max_length=200, primary_key=True)     #"Sample_Plate":"18-9110",
-    samples = models.ManyToManyField('Sample')
+    samples = models.ManyToManyField('SampleRun')
 
-    pipelineName = models.CharField(max_length=200, null=True)
-    pipelineVersion = models.CharField(max_length=200, null=True)
+    pipeline_name = models.CharField(max_length=200, null=True)
+    pipeline_version = models.CharField(max_length=200, null=True)
     panel = models.CharField(max_length=200, null=True)
 
     def __str__(self):
         return self.ws_id
 
 
-class Sample(models.Model):
+class SampleRun(models.Model):
     unique_id = models.CharField(max_length=100, primary_key=True) #run+ws+sample ids
-    sample_id = models.TextField(null=True)
+    sample_obj = models.ForeignKey('Sample', on_delete=models.CASCADE)
 
     description = models.TextField(null=True)                      #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
     sex = models.CharField(max_length=10, null=True)
 
-    I5_name = models.TextField(null=True)                               #"I5_Index_ID":"Bc1",
-    I5_seq = models.TextField(null=True)                               #"index2":"ATCACG"
-    I7_name = models.TextField(null=True)                               #"I7_Index_ID":"Bc1",
-    I7_seq = models.TextField(null=True)                               #"index":"ATCACG"
-    sample_well = models.IntegerField()
+    i5_name = models.CharField(max_length=50, null=True)                              #"I5_Index_ID":"Bc1",
+    i5_seq = models.CharField(max_length=50, null=True)                               #"index2":"ATCACG"
+    i7_name = models.CharField(max_length=50, null=True)                              #"I7_Index_ID":"Bc1",
+    i7_seq = models.CharField(max_length=50, null=True)                              #"index":"ATCACG"
+    sample_well = models.CharField(max_length=50, null=True)
     sample_project = models.CharField(max_length=50, null=True)    #"Sample_Project":"",  usually empty-remove????
 
     def __str__(self):
-        return self.sample_id
+        return self.unique_id
 
 
-# Table for storing MiSeq specific run parameters
-class Miseq(models.Model):
-    run_id = models.ForeignKey(
-        'Run',
-        on_delete=models.CASCADE,
-    )
-    MCS_version = models.CharField(max_length=100)
-    RTA_version = models.CharField(max_length=100)
-    flowcell_serial_no = models.CharField(max_length=100)
-    flowcell_part_no = models.CharField(max_length=100)
-    flowcell_expiry = models.CharField(max_length=100)
-    PR2_serial_no = models.CharField(max_length=100)
-    PR2_part_no = models.CharField(max_length=100)
-    PR2_expiry = models.CharField(max_length=100)
-    reagent_serial_no = models.CharField(max_length=100)
-    reagent_part_no = models.CharField(max_length=100)
-    reagent_expiry = models.CharField(max_length=100)
-    def __str__(self):
-        return self.run_id_id
 
-
-# Table for storing HiSeq specific run parameters
-class Hiseq(models.Model):
-    run_id = models.ForeignKey(
-        'Run',
-        on_delete=models.CASCADE,
-    )
-    workflow_type = models.CharField(max_length=100)
-    paired_end = models.CharField(max_length=100)
-    flowcell_version = models.CharField(max_length=100)
-    sbs_version = models.CharField(max_length=100)
-    pe_version = models.CharField(max_length=100, null=True)
-    index_version = models.CharField(max_length=100)
-    clustering_choice = models.CharField(max_length=100)
-    rapid_run_chemistry = models.CharField(max_length=100)
-    run_mode = models.CharField(max_length=100)
-    application_name = models.CharField(max_length=100)
-    application_version = models.CharField(max_length=100)
-    FPGA_version = models.CharField(max_length=100)
-    CPLD_version = models.CharField(max_length=100)
-    RTA_version = models.CharField(max_length=100)
-    chemistry_version = models.CharField(max_length=100)
-    camera_firmware = models.CharField(max_length=100)
-    camera_driver = models.CharField(max_length=100)
-    sbs_reagent_kit = models.CharField(max_length=100)
-    index_reagent_kit = models.CharField(max_length=100)
-    def __str__(self):
-        return self.run_id_id
-
-
-# Table for storing NextSeq specific run parameters
-class Nextseq(models.Model):
-    run_id = models.ForeignKey(
-        'Run',
-        on_delete=models.CASCADE,
-    )
-    instrument_id = models.CharField(max_length=100)
-    application_name = models.CharField(max_length=100)
-    application_version = models.CharField(max_length=100)
-    RTA_version = models.CharField(max_length=100)
-    systemsuite_version = models.CharField(max_length=100)
-    flowcell_serial = models.CharField(max_length=100)
-    PR2_serial_no = models.CharField(max_length=100)
-    reagent_serial_no = models.CharField(max_length=100)
-    experiment_name = models.CharField(max_length=100)
-    library_id = models.CharField(max_length=100)
-    chemistry = models.CharField(max_length=100)
-    focus_method = models.CharField(max_length=100)
-    surface_to_scan = models.CharField(max_length=100)
-    paired_end = models.CharField(max_length=100)
-    custom_R1_primer = models.CharField(max_length=100)
-    custom_R2_perimer = models.CharField(max_length=100)
-    custom_index_primer = models.CharField(max_length=100)
-    custom_index2_primer = models.CharField(max_length=100)
-    uses_custom_R1_primer = models.CharField(max_length=100)
-    uses_custom_R2_perimer = models.CharField(max_length=100)
-    uses_custom_index_primer = models.CharField(max_length=100)
-    uses_custom_index2_primer = models.CharField(max_length=100)
-    run_management_type = models.CharField(max_length=100)
-    basespace_id = models.CharField(max_length=100)
-    basespace_runmode = models.CharField(max_length=100)
-    computer_name = models.CharField(max_length=100)
-    max_reagent_kit_cycles = models.CharField(max_length=100)
-    def __str__(self):
-        return self.run_id_id
 
 
 

@@ -1,21 +1,34 @@
 import xml.etree.ElementTree as ET
 import os.path
+import xmltodict
+import json
 
 
-def get_variables(run_folder):
-    runparameter_options = [run_folder + r"/RunParameters.xml", run_folder + r"/runParameters.xml"]
-    if os.path.isfile(runparameter_options[0]) is True:
+def get_runparameters_dict(run_folder):
+    # get path to runparametrs file - first R could be either upper or lower case
+    runparameter_options = [run_folder + r"/RunParameters.xml", run_folder + r"/runParameters.xml"] # TODO use path package
+    if os.path.isfile(runparameter_options[0]):
         runparameters_path = runparameter_options[0]
-    elif os.path.isfile(runparameter_options[1]) is True:
+    elif os.path.isfile(runparameter_options[1]):
         runparameters_path = runparameter_options[1]
     else:
-        exit("ERROR  Could not open file " + runparameter_options[0] + " or " + runparameter_options[1])
+        exit(f"ERROR  Could not open file {runparameter_options[0]} or {runparameter_options[1]}") # TODO add logging
 
-    runparameters_tree = ET.parse(runparameters_path)
-    global runparameters
-    runparameters = runparameters_tree.getroot()
+    # turn XML file into a dictionary
+    with open(runparameters_path) as f:
+        runinfo_dict = xmltodict.parse(f.read())
+
+    return runinfo_dict
 
 
+
+
+
+
+
+
+
+'''
 def instrument_type(run_folder):
     get_variables(run_folder)
     if runparameters.find("Setup").find("ApplicationName").text == "HiSeq Control Software":
@@ -81,3 +94,4 @@ def nextseq2(run_folder, dictionary, runparameter_value1, runparameter_value2):
             dictionary[runparameter_value2] = parameter.find(runparameter_value1).find(runparameter_value2).text
         else:
             dictionary[runparameter_value2] ="Null"
+'''

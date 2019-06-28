@@ -7,7 +7,7 @@ def parse(run_folder):
     """
 
     # make empty dict to store output
-    out_dict = {}
+    interop_dict = {}
 
     # taken from illumina interops package documentation, all of this is required, 
     # even though only the summary variable is used further on
@@ -19,13 +19,12 @@ def parse(run_folder):
     py_interop_summary.summarize_run_metrics(run_metrics, summary)
 
     # parse data from interop files -- % reads over Q30, cluster density, clusters passing filter
-    out_dict["Percent Q30"] = round(summary.total_summary().percent_gt_q30(), 2)
-    out_dict["Cluster density"] = round(summary.at(0).at(0).density().mean() / 1000, 2)
-    out_dict["Percent PF"] = round(summary.at(0).at(0).percent_pf().mean(), 2)
-    out_dict["Phasing"] = round(summary.at(0).at(0).phasing().mean(), 2)
-    out_dict["Prephasing"] = round(summary.at(0).at(0).prephasing().mean(), 2)
-    out_dict["Error rate"] = round(summary.total_summary().error_rate(), 2)
-    out_dict["Aligned"] = round(summary.total_summary().percent_aligned(), 2)
+    interop_dict["percent_q30"] = round(summary.total_summary().percent_gt_q30(), 2)
+    interop_dict["cluster_density"] = round(summary.at(0).at(0).density().mean() / 1000, 2)
+    interop_dict["percent_pf"] = round(summary.at(0).at(0).percent_pf().mean(), 2)
+    interop_dict["phasing"] = round(summary.at(0).at(0).phasing().mean(), 2)
+    interop_dict["prephasing"] = round(summary.at(0).at(0).prephasing().mean(), 2)
+    interop_dict["error_rate"] = round(summary.total_summary().error_rate(), 2)
+    interop_dict["aligned"] = round(summary.total_summary().percent_aligned(), 2)
 
-
-    return out_dict
+    return interop_dict
