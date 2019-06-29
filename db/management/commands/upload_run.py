@@ -1,24 +1,21 @@
 """
 ----------------------------------------------------------------------------------------------------
-main.py
--- parse data from runInfo.xml and add to runinfo dictionary
+upload_run.py
+-- parse data from runInfo.xml and add to run level dictionary
+-- parse data from RunParameters.xml and add to run level dictionary
+-- parse data from interops files and add to run level dictionary
 -- parse data from samplesheet.csv and add to samplesheet dictionary
--- parse data from interops files and add to interop dictionary
--- add data from dictionaries above to runlog table in RunlogDB
--- determine if run was from hiseq or miseq
--- add data from RunParameters.xml file to either hiseq or miseq table in RunlogDB
+-- upload data
+-- determine if run was from miseq/hiseq/nextseq
 ----------------------------------------------------------------------------------------------------
 """
 import sys
 import json
+
 from django.core.management.base import BaseCommand, CommandError
-from db.models import *
-# Import scripts
 from db.utils.parsers import add_to_db, parse_interop, parse_runinfo, parse_runparameters, parse_samplesheet
-#from . import add_to_db_new
+from db.models import *
 
-
-#from .models import *
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -30,15 +27,15 @@ class Command(BaseCommand):
         run_folder = options['run_folder']
         #run_folder = r"/Users/erik/Documents/RunLog"
 
-# ----------------------------------------------------------------------------------------------------
-# PARSE RUNINFO
+    # ----------------------------------------------------------------------------------------------------
+    # PARSE RUNINFO
 
         runinfo_full_dict = parse_runinfo.get_runinfo_dict(run_folder)
         run_sorted_dict = parse_runinfo.extract_data(runinfo_full_dict)
 
 
-# ----------------------------------------------------------------------------------------------------
-# PARSE RUNPARAMETERS
+    # ----------------------------------------------------------------------------------------------------
+    # PARSE RUNPARAMETERS
 
         runparameters_full_dict = parse_runparameters.get_runparameters_dict(run_folder)
         run_sorted_dict['raw_runparameters_json'] = json.dumps(runparameters_full_dict, indent=2, separators=(',', ':'))
@@ -46,19 +43,15 @@ class Command(BaseCommand):
         # TODO any specific data needed - chemistry version??
 
 
-# ----------------------------------------------------------------------------------------------------
-# PARSE INTEROPS
-
-        # create empty dictionary
-        #interop_dict = {}
+    # ----------------------------------------------------------------------------------------------------
+    # PARSE INTEROPS
 
         # parse (parameters set in function)
         run_sorted_dict.update(parse_interop.parse(run_folder))
 
 
-# ----------------------------------------------------------------------------------------------------
-# PARSE SAMPLESHEET
-
+    # ----------------------------------------------------------------------------------------------------
+    # PARSE SAMPLESHEET
 
         samplesheet_full_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
 
@@ -71,11 +64,14 @@ class Command(BaseCommand):
         #print(samplesheet_full_dict)
 
 
-# ----------------------------------------------------------------------------------------------------
-# ADD TO DATABASE
-
+    # ----------------------------------------------------------------------------------------------------
+    # ADD TO DATABASE
 
         # TODO: Format pipeline???
+        # TODO: function to reformat data if NIPT
+
+
+        
         worksheets = samplesheet_full_dict['Data'].keys()
         worksheet_obj_list = []
         for ws in worksheets:
@@ -107,8 +103,6 @@ class Command(BaseCommand):
                         sample_obj=sample_obj,
                         description=sample_data['Description'],
                         sex=sample_data['sex'],
-                        i5_name='',
-                        i5_seq='',
                         i7_name=sample_data['I7_Index_ID'],
                         i7_seq=sample_data['index'],
                         sample_well=sample_data['Sample_Well'],
@@ -147,6 +141,7 @@ class Command(BaseCommand):
             instrument_obj = Instrument.objects.get(instrument_id=run_sorted_dict['instrument'])
         except Instrument.DoesNotExist:
             instrument_id = run_sorted_dict['instrument']
+            # get instrument type from instument id
             if instrument_id.startswith('M'):
                 instrument_type = 'MiSeq'
             elif instrument_id.startswith('D'):
@@ -155,6 +150,7 @@ class Command(BaseCommand):
                 instrument_type = 'NextSeq'
             else:
                 instrument_type = ''
+            # make new instrument object
             instrument_obj = Instrument(
                 instrument_id=instrument_id,
                 instrument_type=instrument_type
@@ -164,6 +160,7 @@ class Command(BaseCommand):
         # add run
         try:
             run_obj = Run.objects.get(run_id=run_sorted_dict['run_id'])
+            # TODO add warning if run already exists?
         except Run.DoesNotExist:
             run_obj = Run(
                 run_id=run_sorted_dict['run_id'],
