@@ -253,4 +253,4 @@ class SampleMetrics(models.Model):
     het_snp_q = models.IntegerField(blank=True, null=True) 
 
     def __str__(self):
-        return self.unique_id
+        return self.sample_id
