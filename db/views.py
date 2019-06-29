@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.template import loader
 from .models import Run
 from .forms import TatForm, SearchForm
-from .functions import tab_raw, tab_panels, tab_other
+from .utils.openpyxl_functions import tab_raw, tab_panels, tab_other
 
 
 def index(request):
@@ -17,13 +17,13 @@ def index(request):
                 # save input variables but don't commit to the database
                 search = form.cleaned_data
                 # perform query based on input values
-                runs = Run.objects.all()
-                #runs = Run.objects.filter(
-                #    run_id__contains=search['run_id'], 
-                #    experiment__contains=search['experiment'],
-                #    samples__contains=search['samples'],
-                #    pipeline__contains=search['pipeline'],
-                #    ).order_by('-instrument_date')
+                #runs = Run.objects.all()
+                runs = Run.objects.filter(
+                    run_id__contains=search['run_id'], 
+                    experiment__contains=search['experiment'],
+                    #samples__contains=search['samples'],
+                    #pipeline__contains=search['pipeline'],
+                    ).order_by('-instrument_date')
                 # return rendered results page
                 template = loader.get_template('db/search.html')
                 context = {
