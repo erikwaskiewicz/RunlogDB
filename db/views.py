@@ -14,7 +14,7 @@ def index(request):
         if 'search_input' in request.POST:
             form = SearchForm(request.POST)
             if form.is_valid():
-                # save input variables but don't commit to the database
+                # save input variables
                 search = form.cleaned_data
                 # perform query based on input values
                 #runs = Run.objects.all()
@@ -36,7 +36,7 @@ def index(request):
         if 'tat_input' in request.POST:
             form = TatForm(request.POST)
             if form.is_valid():
-                # save input dates but don't commit to the database
+                # save input dates
                 dates = form.cleaned_data
                 # perform query based on input values
                 runs = Run.objects.filter(instrument_date__range=(dates['start_date'], dates['end_date'])).order_by('instrument_date', 'experiment')

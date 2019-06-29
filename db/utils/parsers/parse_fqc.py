@@ -1,9 +1,8 @@
-import csv 
-import os 
+import csv
+import os
 '''
 Creating a Fastqc dictionary of sample quality metrics
 '''
-fqcdict={}
 
 
 def Fastqc (file):
@@ -26,10 +25,9 @@ def Fastqc (file):
                 fqcdict["Read_Group"] = Read_Group
                 fqcdict["Lane"] = Lane
                 fqcdict[metrics] = result
-                 
-                
 
         return (fqcdict)
+
 
 def Fastqc_CRUK (file):
     with open (file) as file:
@@ -45,13 +43,9 @@ def Fastqc_CRUK (file):
                 fqcdict["UniqueID"] = os.environ["UniqueID"]
                 fqcdict["general_readinfo"]= column[2]
                 fqcdict["SampleID"]= os.environ["SampleID"]
-                fqcdict["RunID"] = os.environ["RunID"] 
+                fqcdict["RunID"] = os.environ["RunID"]
                 fqcdict["Read_Group"] = Read_Group
                 fqcdict["Lane"] = Lane
                 fqcdict[metrics] = result
-
-
-                 
-                
 
         return (fqcdict)

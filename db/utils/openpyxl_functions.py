@@ -6,7 +6,7 @@ Loops through the remaining records and saves each to a new row.
 """
 def tab_other(wb, runs, panels):
     # define headers
-    headers = ['Panel', 'Run ID', 'Worksheet', 'Description', 'Setup Date', 'Run Date', 'TAT']
+    #headers = ['Panel', 'Run ID', 'Worksheet', 'Description', 'Setup Date', 'Run Date', 'TAT']
     headers = ['Panel', 'Run ID', 'Worksheet', 'Worksheet Date', 'Setup Date', 'Run Date', 'TAT1', 'TAT2', 'Total TAT', 'Description']
     # get queryset and exclude runs where the panels are in the input list
     qs = runs

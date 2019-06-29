@@ -21,77 +21,14 @@ def get_runparameters_dict(run_folder):
     return runinfo_dict
 
 
-
-
-
-
-
-
-
-'''
-def instrument_type(run_folder):
-    get_variables(run_folder)
-    if runparameters.find("Setup").find("ApplicationName").text == "HiSeq Control Software":
-        instrument = "HiSeq"
-    elif runparameters.find("Setup").find("ApplicationName").text == "MiSeq Control Software":
-        instrument = "MiSeq"
-    elif runparameters.find("Setup").find("ApplicationName").text == "NextSeq Control Software":
-        instrument = "NextSeq"
+def get_instrument_type(instrument_id):
+    if instrument_id.startswith('M'):
+        instrument_type = 'MiSeq'
+    elif instrument_id.startswith('D'):
+        instrument_type = 'HiSeq'
+    elif instrument_id.startswith('NB'):
+        instrument_type = 'NextSeq'
     else:
-        exit("ERROR  Instrument type could not be determined")
-    return instrument
+        instrument_type = ''
 
-
-def miseq1(run_folder, dictionary, runparameter_value):
-    get_variables(run_folder)
-    for parameter in runparameters.iter("RunParameters"):
-        if parameter.find(runparameter_value) is not None:
-            dictionary[runparameter_value] = parameter.find(runparameter_value).text
-        else:
-            dictionary[runparameter_value] = "Null"
-
-
-def miseq2(run_folder, dictionary, runparameter_value1, runparameter_value2):
-    get_variables(run_folder)
-    for parameter in runparameters.iter("RunParameters"):
-        if parameter.find(runparameter_value1).find(runparameter_value2) is not None:
-            dictionary[runparameter_value1 + runparameter_value2] = parameter.find(runparameter_value1).find(runparameter_value2).text
-        else:
-            dictionary[runparameter_value1 + runparameter_value2] = "Null"
-
-
-def hiseq1(run_folder, dictionary, runparameter_value):
-    get_variables(run_folder)
-    for parameter in runparameters.iter("RunParameters"):
-        if parameter.find("Setup").find(runparameter_value) is not None:
-            dictionary[runparameter_value] = parameter.find("Setup").find(runparameter_value).text
-        else:
-            dictionary[runparameter_value] = "Null"
-
-
-def hiseq2(run_folder, dictionary, runparameter_value1, runparameter_value2):
-    get_variables(run_folder)
-    for parameter in runparameters.iter("RunParameters"):
-        if parameter.find("Setup").find("ReagentKits").find(runparameter_value1).find(runparameter_value2).find("ID") is not None:
-            dictionary[runparameter_value1 + runparameter_value2] = parameter.find("Setup").find("ReagentKits").find(runparameter_value1).find(runparameter_value2).find("ID").text
-        else:
-            dictionary[runparameter_value1 + runparameter_value2] ="Null"
-
-
-def nextseq1(run_folder, dictionary, runparameter_value):
-    get_variables(run_folder)
-    for parameter in runparameters.iter("RunParameters"):
-        if parameter.find(runparameter_value) is not None:
-            dictionary[runparameter_value] = parameter.find(runparameter_value).text
-        else:
-            dictionary[runparameter_value] = "Null"
-
-
-def nextseq2(run_folder, dictionary, runparameter_value1, runparameter_value2):
-    get_variables(run_folder)
-    for parameter in runparameters.iter("RunParameters"):
-        if parameter.find(runparameter_value1).find(runparameter_value2) is not None:
-            dictionary[runparameter_value2] = parameter.find(runparameter_value1).find(runparameter_value2).text
-        else:
-            dictionary[runparameter_value2] ="Null"
-'''
+    return instrument_type

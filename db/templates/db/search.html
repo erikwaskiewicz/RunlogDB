@@ -47,7 +47,7 @@
             <td rowspan="{{ run.worksheets.all|length }}">{{ run.run_id }}</td>
         {% endif %}
             <td>{{ ws }}</td>
-            <td>{{ ws.panel }}</td>
+            <td>{{ ws.get_panel }}</td>
             <td>{{ ws.list_samples }}</td>
         </tr>
 
