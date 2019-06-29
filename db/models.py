@@ -28,7 +28,8 @@ class Run(models.Model):
 
     instrument_date = models.DateField()
     setup_date = models.DateField(blank=True, null=True)
-    samplesheet_date = models.CharField(max_length=255, blank=True)
+    samplesheet_date = models.DateField(blank=True, null=True)
+    #TODO add worksheet date, or is this the same as samplesheet date?
 
     investigator = models.CharField(max_length=255, blank=True)
     experiment = models.CharField(max_length=255, blank=True)
@@ -40,10 +41,10 @@ class Run(models.Model):
 
     num_reads = models.IntegerField()
     length_read1 = models.IntegerField()
-    length_read2 = models.IntegerField(null=True)
+    length_read2 = models.IntegerField(blank=True, null=True)
     num_indexes = models.IntegerField()
     length_index1 = models.IntegerField()
-    length_index2 = models.IntegerField(null=True)
+    length_index2 = models.IntegerField(blank=True, null=True)
 
     percent_q30 = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     cluster_density = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
@@ -91,7 +92,7 @@ class Run(models.Model):
 
 
 class Worksheet(models.Model):
-    ws_id = models.CharField(max_length=255, primary_key=True)     #"Sample_Plate":"18-9110",
+    ws_id = models.CharField(max_length=255, primary_key=True)
     samples = models.ManyToManyField('SampleRun')
 
     pipeline_name = models.CharField(max_length=255, blank=True)
@@ -134,18 +135,18 @@ class Worksheet(models.Model):
 
 
 class SampleRun(models.Model):
-    unique_id = models.CharField(max_length=255, primary_key=True)      #run+ws+sample_id
+    unique_id = models.CharField(max_length=255, primary_key=True) #run+ws+sample_id
     sample_obj = models.ForeignKey('Sample', on_delete=models.CASCADE)
 
-    description = models.TextField(blank=True)                           #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
+    description = models.TextField(blank=True)
     sex = models.CharField(max_length=255, blank=True)
 
-    i5_name = models.CharField(max_length=255, blank=True)                #"I5_Index_ID":"Bc1"
-    i5_seq = models.CharField(max_length=255, blank=True)                 #"index2":"ATCACG"
-    i7_name = models.CharField(max_length=255, blank=True)                #"I7_Index_ID":"Bc1"
-    i7_seq = models.CharField(max_length=255, blank=True)                 #"index":"ATCACG"
+    i5_name = models.CharField(max_length=255, blank=True)
+    i5_seq = models.CharField(max_length=255, blank=True)
+    i7_name = models.CharField(max_length=255, blank=True)
+    i7_seq = models.CharField(max_length=255, blank=True)
     sample_well = models.CharField(max_length=255, blank=True)
-    sample_project = models.CharField(max_length=255, blank=True)         #"Sample_Project":""
+    sample_project = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.unique_id
@@ -177,12 +178,15 @@ class Fastqc(models.Model):
     adapter_content = models.CharField(max_length=255, blank=True)
     kmer_content = models.CharField(max_length=255, blank=True)
 
+    def __str__(self):
+        return self.unique_id
+
 
 class SampleMetrics(models.Model):
     """
     Model to store output from the Picard HS metrics program.
     One per sample.
-    #TODO - is this run/ws level or sample level???
+    # TODO - is this run/ws level or sample level???
     """
     unique_id = models.ForeignKey(
         'Sample',
@@ -247,3 +251,6 @@ class SampleMetrics(models.Model):
     gc_dropout = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
     het_snp_sensitivity = models.DecimalField(max_digits=20, decimal_places=10, blank=True, null=True)
     het_snp_q = models.IntegerField(blank=True, null=True) 
+
+    def __str__(self):
+        return self.unique_id

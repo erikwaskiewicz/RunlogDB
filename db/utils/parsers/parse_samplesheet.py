@@ -233,8 +233,16 @@ def extract_data(samplesheet_dict):
     except KeyError: samplesheet_sorted['investigator'] = ''
     try: samplesheet_sorted['experiment'] = samplesheet_dict['Header']['Experiment_Name']
     except KeyError: samplesheet_sorted['experiment'] = ''
-    try: samplesheet_sorted['samplesheet_date'] = samplesheet_dict['Header']['Date']
-    except KeyError: samplesheet_sorted['samplesheet_date'] = ''
+
+    try:
+        ss_date = samplesheet_dict['Header']['Date'] # TODO - check name of date field in ss generator
+        year = ss_date.split('/')[0]
+        month = ss_date.split('/')[1]
+        day = ss_date.split('/')[2]
+        samplesheet_sorted['samplesheet_date'] = date(int(year), int(month), int(day)).isoformat()
+    except: 
+        samplesheet_sorted['samplesheet_date'] = None
+
     try: samplesheet_sorted['workflow'] = samplesheet_dict['Header']['Workflow']
     except KeyError: samplesheet_sorted['workflow'] = ''
     try: samplesheet_sorted['application'] = samplesheet_dict['Header']['Application']

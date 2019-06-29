@@ -94,7 +94,7 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
         run_obj = Run(
             run_id=run_level_dict['run_id'],
             instrument=instrument_obj,
-            instrument_date='2000-01-01', #run_level_dict['instrument_date'], TODO - reformat dict date
+            instrument_date=run_level_dict['instrument_date'],
             samplesheet_date=run_level_dict['samplesheet_date'],
             investigator=run_level_dict['investigator'],
             experiment=run_level_dict['experiment'],
@@ -177,7 +177,8 @@ class Command(BaseCommand):
         # PARSE SAMPLESHEET
         full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
 
-        # reformat data if NIPT run  #TODO finish off
+        # reformat data if NIPT run  
+        # TODO finish off
         if options['nipt']:
             full_samplesheet_dict = parse_samplesheet.sort_nipt_data(full_samplesheet_dict)
 

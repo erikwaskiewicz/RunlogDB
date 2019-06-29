@@ -25,8 +25,15 @@ def extract_data(runinfo_dict):
     runinfo_sorted_dict = {
         'run_id': runinfo_dict['RunInfo']['Run']['@Id'],   #@ == attribute
         'instrument': runinfo_dict['RunInfo']['Run']['Instrument'],
-        'instrument_date': runinfo_dict['RunInfo']['Run']['Date']   #TODO make date object
     }
+
+    # format date object
+    instrument_date = runinfo_dict['RunInfo']['Run']['Date']
+    year = '20' + instrument_date[0:2]
+    month = instrument_date[2:4]
+    day = instrument_date[4:6]
+    runinfo_sorted_dict['instrument_date'] = date(int(year), int(month), int(day)).isoformat()
+
     
     # parse reads from xml dict and sort data
     reads = runinfo_dict['RunInfo']['Run']['Reads']['Read']
