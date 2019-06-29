@@ -80,29 +80,33 @@ class Worksheet(models.Model):
     def __str__(self):
         return self.ws_id
 
+    def list_samples(self):
+        """Make a string list of all samples in a worksheet"""
+        sample_runs = self.samples.all()
+        samples = [s.sample_obj.sample_id for s in sample_runs]
+        return ', '.join(samples)
+
+    def get_panel(self):
+        """Turn panel code into the panel name recognised by the lab"""
+        pass
+
 
 class SampleRun(models.Model):
-    unique_id = models.CharField(max_length=100, primary_key=True) #run+ws+sample ids
+    unique_id = models.CharField(max_length=100, primary_key=True)      #run+ws+sample_id
     sample_obj = models.ForeignKey('Sample', on_delete=models.CASCADE)
 
-    description = models.TextField(null=True)                      #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
+    description = models.TextField(null=True)                           #pipelineName=SomaticAmplicon;pipelineVersion=1.7.5;panel=NGHS-201X
     sex = models.CharField(max_length=10, null=True)
 
-    i5_name = models.CharField(max_length=50, null=True)                              #"I5_Index_ID":"Bc1",
-    i5_seq = models.CharField(max_length=50, null=True)                               #"index2":"ATCACG"
-    i7_name = models.CharField(max_length=50, null=True)                              #"I7_Index_ID":"Bc1",
-    i7_seq = models.CharField(max_length=50, null=True)                              #"index":"ATCACG"
+    i5_name = models.CharField(max_length=50, null=True)                #"I5_Index_ID":"Bc1"
+    i5_seq = models.CharField(max_length=50, null=True)                 #"index2":"ATCACG"
+    i7_name = models.CharField(max_length=50, null=True)                #"I7_Index_ID":"Bc1"
+    i7_seq = models.CharField(max_length=50, null=True)                 #"index":"ATCACG"
     sample_well = models.CharField(max_length=50, null=True)
-    sample_project = models.CharField(max_length=50, null=True)    #"Sample_Project":"",  usually empty-remove????
+    sample_project = models.CharField(max_length=50, null=True)         #"Sample_Project":""
 
     def __str__(self):
         return self.unique_id
-
-
-
-
-
-
 
 
 '''

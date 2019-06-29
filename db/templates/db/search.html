@@ -26,26 +26,37 @@
 <!--Results section-->
 <h3>Results</h3>
 <table class="table table-sm table-condensed table-hover table-responsive">
+
     <thead><!--Results table headers-->
         <tr>
-            <td width="10%"><b>Worksheet</b></td>
             <td width="35%"><b>Run ID</b></td>
+            <td width="10%"><b>Worksheet</b></td>
             <td width="10%"><b>Pipeline</b></td>
             <td width="45%"><b>Samples</b></td>
         </tr>
     </thead>
+
     <tbody><!--loop through runs to make table rows-->
-        {% for run in runs %}
+    {% for run in runs %}
+        {% for ws in run.worksheets.all %}
+
         <tr>
-            <!-- TO DO: make button to view whole record
-            <td><span class="badge badge-primary">View</button></td>  -->
-            <td width="10%">{{ run.experiment }}</td>
-            <td width="35%">{{ run.run_id }}</td>
-            <td width="10%">{{ run.pipeline }}</td>
-            <td width="45%">{{ run.samples }}</td>
+        <!--only include this row for the first ws in the run, 
+            set the row span to the number of worksheets-->
+        {% if ws == run.worksheets.all|first %}
+            <td rowspan="{{ run.worksheets.all|length }}">{{ run.run_id }}</td>
+        {% endif %}
+            <td>{{ ws }}</td>
+            <td>{{ ws.panel }}</td>
+            <td>{{ ws.list_samples }}</td>
         </tr>
-        {% endfor %}
+
+        {% endfor %}    
+    {% endfor %}
+    <!-- TO DO: make button to view whole record
+    <td><span class="badge badge-primary">View</button></td>  -->
     </tbody>
+
 </table>
 
 {% endblock %}
