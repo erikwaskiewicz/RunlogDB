@@ -174,7 +174,6 @@ class Command(BaseCommand):
         run_level_dict.update(parse_interop.parse(run_folder))
 
         # PARSE SAMPLESHEET
-        # TODO finish off
         if options['nipt']:
             full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder, run_type='nipt')
         else:
@@ -185,7 +184,7 @@ class Command(BaseCommand):
         run_level_dict.update(parse_samplesheet.extract_data(full_samplesheet_dict))
         run_level_dict['raw_samplesheet_json'] = json.dumps(full_samplesheet_dict, indent=2, separators=(',', ':'))
 
-        #print(run_level_dict['raw_samplesheet_json'])
+        print(run_level_dict['raw_samplesheet_json'])
         #print(run_level_dict.keys())
         #print(full_samplesheet_dict)
 

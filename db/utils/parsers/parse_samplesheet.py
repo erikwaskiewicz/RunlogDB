@@ -34,7 +34,7 @@ def extract_section(section_dict, section, samplesheet):
     return extracted_section
 
 
-def format_header_section(header_section):
+def format_section(header_section):
     header_dict = {}
 
     for item in header_section:
@@ -102,10 +102,6 @@ def make_data_section_dict(worksheets, data_section):
     """
     data_dict = {}
     for worksheet in worksheets:
-        # TODO change column for NIPT - maybe make seperate function for nipt
-        #if run_type == 'nipt':
-        #    subset = data_section[data_section.Sample_Project == worksheet]
-        #    assert len(subset.Sample_Project.unique()) == 1
 
         subset = data_section[data_section.Sample_Plate == worksheet]
 
@@ -113,6 +109,10 @@ def make_data_section_dict(worksheets, data_section):
         assert len(subset.panel.unique()) == 1
         assert len(subset.pipelineName.unique()) == 1
         assert len(subset.pipelineVersion.unique()) == 1
+
+        # change NTC to NTC-worksheet_number
+        subset.at['NTC', 'Sample_Name'] = f'NTC-{worksheet}' # change sample_name
+        subset.rename(index={'NTC': f'NTC-{worksheet}'}, inplace=True) # change sample ID index
 
         # list values that are common to all samples, extract the variables
         ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion']
@@ -152,16 +152,19 @@ def make_data_section_dict(worksheets, data_section):
     return data_dict
 
 
-def make_data_section_dict_nipt(worksheets, data_section):
+def make_data_section_dict_nipt(worksheets, data_section, experiment_name):
     data_dict = {}
     for worksheet in worksheets:
-        # 
         subset = data_section[data_section.Sample_Project == worksheet]
         assert len(subset.Sample_Project.unique()) == 1
 
         # extract sample specific info from df into json
+        # TODO - rename NTC as NTC+WS??
+        subset = subset.drop(subset[subset.Lane == '2'].index)
         ws_specific = ['Sample_Plate', 'Sample_Project']
-        sample_specific_json = json.loads(subset.drop(ws_specific, axis=1).to_json(orient='index'))
+        subset_processed = subset.drop(ws_specific, axis=1).set_index('Sample_ID')
+
+        sample_specific_json = json.loads(subset_processed.to_json(orient='index'))
 
         for s in sample_specific_json:
             # make sure there is always a sex field
@@ -174,6 +177,8 @@ def make_data_section_dict_nipt(worksheets, data_section):
                 if value == None:
                     sample_specific_json[s][key] = ''
 
+        if 'fail' in worksheet.lower():
+            worksheet = f'{experiment_name}_Failed'
         # add to python dic with worksheet as the key
         data_dict[worksheet] = {
             'Sample_Project': subset.Sample_Project.unique()[0],
@@ -182,7 +187,7 @@ def make_data_section_dict_nipt(worksheets, data_section):
             'pipelineVersion': '',
             'panel': 'NIPT',
             'samples': sample_specific_json
-            }
+            } # TODO - add other nipt fields to models?
         
     return data_dict
 
@@ -220,7 +225,7 @@ def get_samplesheet_dict(run_folder, run_type=''):
                 if line[0] == '':
                     end = n
                 if n == (no_of_lines - 1):
-                    end = n
+                    end = n+1
                 section_line_nos[key] = [start, end]
                 in_section = False
 
@@ -231,22 +236,32 @@ def get_samplesheet_dict(run_folder, run_type=''):
     # make dict of whole samplesheet
     combined_dict = {}
     for section in section_line_nos.keys():
+        
         extract = extract_section(section_line_nos, section, samplesheet)
+
         if section == 'Header':
-            extract_dict = format_header_section(extract)
-        if section == 'Reads':
-            extract_dict = format_reads_section(extract)
-        if section == 'Data':
-            data_section = pd.DataFrame(extract[1:], columns=extract[0])
-            data_section = extract_description_data(data_section)
             if run_type == 'nipt':
-                worksheets = data_section.Sample_Project.unique()
-                extract_dict = make_data_section_dict_nipt(worksheets, data_section)
+                # swap experiment and investigator round in nipt
+                extract_dict = format_section(extract)
+                extract_dict['Experiment_Name'], extract_dict['Investigator_Name'] = extract_dict['Investigator_Name'], extract_dict['Experiment_Name']
             else:
+                extract_dict = format_section(extract)
+        elif section == 'Reads':
+            extract_dict = format_reads_section(extract)
+        elif section == 'Data':
+            data_section = pd.DataFrame(extract[1:], columns=extract[0])
+
+            if run_type == 'nipt':
+                experiment_name = combined_dict['Header']['Experiment_Name']
+                worksheets = data_section.Sample_Project.unique()
+                extract_dict = make_data_section_dict_nipt(worksheets, data_section, experiment_name)
+            else:
+                data_section = extract_description_data(data_section)
                 worksheets = data_section.Sample_Plate.unique()
                 extract_dict = make_data_section_dict(worksheets, data_section)
         else:
-            pass
+            extract_dict = format_section(extract)
+
             # TODO add handling for other sections - make dict and add to combined dict
         combined_dict[section] = extract_dict
 
@@ -287,21 +302,3 @@ def extract_data(samplesheet_dict):
     except KeyError: samplesheet_sorted['description'] = ''
 
     return samplesheet_sorted
-
-
-def sort_nipt_data(samplesheet_dict):
-    """
-    Sort the samplesheet dictionary to account for NIPT runs.
-    NIPT samplesheets dont go through our usual samplesheet generator 
-    so are in a different format to the others.
-    """
-    # there is no panel in the description field, set panel to NIPT
-    print('nipt')
-    #samplesheet_dict['panel'] = "NIPT" # TODO - panel is nested within ws - need to test wih NIPT samplesheet
-    # experiment and investigator are switched in NIPT samplesheets, switch them round
-    experiment = samplesheet_dict['Header']['Experiment_Name']
-    investigator = samplesheet_dict['Header']['Investigator_Name']
-    samplesheet_dict['Header']['Experiment_Name'] = investigator
-    samplesheet_dict['Header']['Investigator_Name'] = experiment
-
-    return samplesheet_dict
