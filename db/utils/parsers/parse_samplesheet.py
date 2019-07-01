@@ -58,36 +58,35 @@ def format_reads_section(reads_section):
     return reads_dict
 
 
+
+
+#---------------------------------------------------------------------------
 def extract_description_data(data_section):
+    """
+    take a dataframe of the data section and split out the items in the 
+    description field into individual columns
+    """
     # open empty df to save description field items to
     desc_df = pd.DataFrame()
-
     # loop through each row in the data_Section df
     for sample in data_section.Sample_ID:
 
         # subset the data to only include the sample row
         subset = data_section[data_section.Sample_ID == sample]
-
-        # make an empty df for the row data
-        temp_df = pd.DataFrame()
+        # make an df for the row data with sample ID for merging later on
+        temp_df = pd.DataFrame(data={'Sample_ID': [ sample ]})
 
         # split the description field into its key-value pairs and loop through
         desc = subset.Description.values[0].split(';')
-
         for i in desc:
-
-            # save sample ID for merging later on
-            temp_df['Sample_ID'] = sample
-
             # split the key-value pair, add to df - key is column name, value is record
             try:
                 desc_split = i.split('=')
                 temp_df[desc_split[0]] = [desc_split[1]]
             except IndexError:
                 pass
-
-            # append the temp df onto the main description field df
-            desc_df = desc_df.append(temp_df, ignore_index=True, sort=False)
+        # append the temp df onto the main description field df
+        desc_df = desc_df.append(temp_df, ignore_index=True, sort=False)
     
     # merge
     data_section_out = pd.merge(data_section, desc_df, on='Sample_ID')
@@ -96,16 +95,19 @@ def extract_description_data(data_section):
     return data_section_out
 
 
-def merge_description_data(data_section, desc_df):
-    data_section = pd.merge(data_section, desc_df, on='Sample_ID')
-    data_section = data_section.set_index('Sample_ID')
-    
-    return data_section
-
-
 def make_data_section_dict(worksheets, data_section):
+    """
+    Take the data section dictionary after the descriptions have been included and 
+    format it into a dictionary
+    """
+    #print(data_section)
     data_dict = {}
     for worksheet in worksheets:
+        # TODO change column for NIPT - maybe make seperate function for nipt
+        #if run_type == 'nipt':
+        #    subset = data_section[data_section.Sample_Project == worksheet]
+        #    assert len(subset.Sample_Project.unique()) == 1
+
         subset = data_section[data_section.Sample_Plate == worksheet]
 
         assert len(subset.Sample_Plate.unique()) == 1
@@ -123,6 +125,22 @@ def make_data_section_dict(worksheets, data_section):
         # extract sample specific info from df into json
         sample_specific_json = json.loads(subset.drop(ws_specific, axis=1).to_json(orient='index'))
 
+        for s in sample_specific_json:
+            # make sure there is always a sex field
+            try:
+                sample_specific_json[s]['sex']
+            except KeyError:
+                sample_specific_json[s]['sex'] = ''
+            # reformat values to prevent downstream errors
+            for key, value in sample_specific_json[s].items():
+                if value == None:
+                    sample_specific_json[s][key] = ''
+                if key == 'sex':
+                    if value == '1':
+                        sample_specific_json[s][key] = 'M'
+                    elif value == '2':
+                        sample_specific_json[s][key] = 'F'
+
         # add to python dic with worksheet as the key
         data_dict[worksheet] = {
             'Sample_Plate': sample_plate,
@@ -135,16 +153,7 @@ def make_data_section_dict(worksheets, data_section):
     return data_dict
 
 
-def format_data_reads(data_section):
-    data_section = pd.DataFrame(data_section[1:], columns=data_section[0])
-    data_section = extract_description_data(data_section)
-    #data_section = merge_description_data(data_section, desc_df)
-    worksheets = data_section.Sample_Plate.unique()
-    data_dict = make_data_section_dict(worksheets, data_section)
-    
-    return data_dict
-
-
+'''
 def sort_samplesheet_sex(samplesheet_dict):
     for ws in samplesheet_dict['Data']:
         ws_dict = samplesheet_dict['Data'][ws]
@@ -162,16 +171,9 @@ def sort_samplesheet_sex(samplesheet_dict):
             samplesheet_dict['Data'][ws]['samples'][sample]['sex'] = sex
 
     return samplesheet_dict
-
-
-# ---
+'''
 
 # ## Combine header, reads and data into JSON object
-
-# --- 
-# 
-# ## Script
-
 
 # loop through sections dict
 # if header, reads or data sections, call relevant function
@@ -187,6 +189,7 @@ def get_samplesheet_dict(run_folder):
         reader = csv.reader(file)
         samplesheet = list(reader)
 
+    # get section line numbers
     no_of_lines = len(samplesheet)
     section_line_nos = {}
     in_section = False
@@ -210,6 +213,7 @@ def get_samplesheet_dict(run_folder):
     assert 'Header' in section_line_nos
     assert 'Data' in section_line_nos
 
+    # make dict of whole samplesheet
     combined_dict = {}
     for section in section_line_nos.keys():
         extract = extract_section(section_line_nos, section, samplesheet)
@@ -218,15 +222,24 @@ def get_samplesheet_dict(run_folder):
         if section == 'Reads':
             extract_dict = format_reads_section(extract)
         if section == 'Data':
-            extract_dict = format_data_reads(extract)
+            data_section = pd.DataFrame(extract[1:], columns=extract[0])
+            data_section = extract_description_data(data_section)
+            worksheets = data_section.Sample_Plate.unique()
+            extract_dict = make_data_section_dict(worksheets, data_section)
         else:
             pass
-            # add other bit here
+            # TODO add handling for other sections - make dict and add to combined dict
         combined_dict[section] = extract_dict
 
-    combined_dict = sort_samplesheet_sex(combined_dict)
+    #combined_dict = sort_samplesheet_sex(combined_dict)
 
     return combined_dict
+
+
+
+
+
+
 
 
 def extract_data(samplesheet_dict):
