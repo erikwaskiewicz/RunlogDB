@@ -73,20 +73,27 @@ def extract_description_data(data_section):
 
         # split the description field into its key-value pairs and loop through
         desc = subset.Description.values[0].split(';')
-        if len(desc) > 1:
-            for i in desc:
 
-                # save sample ID for merging later on
-                temp_df['Sample_ID'] = sample
+        for i in desc:
 
-                # split the key-value pair, add to df - key is column name, value is record
+            # save sample ID for merging later on
+            temp_df['Sample_ID'] = sample
+
+            # split the key-value pair, add to df - key is column name, value is record
+            try:
                 desc_split = i.split('=')
                 temp_df[desc_split[0]] = [desc_split[1]]
+            except IndexError:
+                pass
 
             # append the temp df onto the main description field df
             desc_df = desc_df.append(temp_df, ignore_index=True, sort=False)
-        
-    return desc_df
+    
+    # merge
+    data_section_out = pd.merge(data_section, desc_df, on='Sample_ID')
+    data_section_out = data_section_out.set_index('Sample_ID')
+
+    return data_section_out
 
 
 def merge_description_data(data_section, desc_df):
@@ -130,8 +137,8 @@ def make_data_section_dict(worksheets, data_section):
 
 def format_data_reads(data_section):
     data_section = pd.DataFrame(data_section[1:], columns=data_section[0])
-    desc_df = extract_description_data(data_section)
-    data_section = merge_description_data(data_section, desc_df)
+    data_section = extract_description_data(data_section)
+    #data_section = merge_description_data(data_section, desc_df)
     worksheets = data_section.Sample_Plate.unique()
     data_dict = make_data_section_dict(worksheets, data_section)
     

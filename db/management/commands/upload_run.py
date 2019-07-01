@@ -178,7 +178,7 @@ class Command(BaseCommand):
         full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
 
         # TODO finish off
-        if options['nipt']:
+        #if options['nipt']:
             # reformat data if NIPT run  
             #full_samplesheet_dict = parse_samplesheet.sort_nipt_data(full_samplesheet_dict)
 
