@@ -236,9 +236,9 @@ def extract_data(samplesheet_dict):
 
     try:
         ss_date = samplesheet_dict['Header']['Date'] # TODO - check name of date field in ss generator
-        year = ss_date.split('/')[0]
+        year = ss_date.split('/')[2]
         month = ss_date.split('/')[1]
-        day = ss_date.split('/')[2]
+        day = ss_date.split('/')[0]
         samplesheet_sorted['samplesheet_date'] = date(int(year), int(month), int(day)).isoformat()
     except: 
         samplesheet_sorted['samplesheet_date'] = None

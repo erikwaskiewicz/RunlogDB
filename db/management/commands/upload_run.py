@@ -140,7 +140,7 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
 
 """
 ----------------------------------------------------------------------------------------------------
-upload_run.py
+upload_run
 -- parse data from runInfo.xml and add to run level dictionary
 -- parse data from RunParameters.xml and add to run level dictionary
 -- parse data from interops files and add to run level dictionary
@@ -175,18 +175,20 @@ class Command(BaseCommand):
         run_level_dict.update(parse_interop.parse(run_folder))
 
         # PARSE SAMPLESHEET
-        full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
-
-        # reformat data if NIPT run  
         # TODO finish off
         if options['nipt']:
-            full_samplesheet_dict = parse_samplesheet.sort_nipt_data(full_samplesheet_dict)
+            # run files are nested one folder further in NIPT runs
+            full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder + 'runs/')
+            # reformat data if NIPT run  
+            #full_samplesheet_dict = parse_samplesheet.sort_nipt_data(full_samplesheet_dict)
+        else:
+            full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
 
         # extract run level fields from samplesheet dict and add to run level dictionary
         run_level_dict.update(parse_samplesheet.extract_data(full_samplesheet_dict))
         run_level_dict['raw_samplesheet_json'] = json.dumps(full_samplesheet_dict, indent=2, separators=(',', ':'))
 
-        #print(run_level_dict['raw_samplesheet_json'])
+        print(run_level_dict['raw_samplesheet_json'])
         #print(run_level_dict.keys())
         #print(full_samplesheet_dict)
 
