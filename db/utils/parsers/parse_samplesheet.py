@@ -73,17 +73,18 @@ def extract_description_data(data_section):
 
         # split the description field into its key-value pairs and loop through
         desc = subset.Description.values[0].split(';')
-        for i in desc:
+        if len(desc) > 1:
+            for i in desc:
 
-            # save sample ID for merging later on
-            temp_df['Sample_ID'] = sample
+                # save sample ID for merging later on
+                temp_df['Sample_ID'] = sample
 
-            # split the key-value pair, add to df - key is column name, value is record
-            desc_split = i.split('=')
-            temp_df[desc_split[0]] = [desc_split[1]]
+                # split the key-value pair, add to df - key is column name, value is record
+                desc_split = i.split('=')
+                temp_df[desc_split[0]] = [desc_split[1]]
 
-        # append the temp df onto the main description field df
-        desc_df = desc_df.append(temp_df, ignore_index=True, sort=False)
+            # append the temp df onto the main description field df
+            desc_df = desc_df.append(temp_df, ignore_index=True, sort=False)
         
     return desc_df
 

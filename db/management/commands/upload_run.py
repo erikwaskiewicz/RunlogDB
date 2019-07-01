@@ -175,14 +175,13 @@ class Command(BaseCommand):
         run_level_dict.update(parse_interop.parse(run_folder))
 
         # PARSE SAMPLESHEET
+        full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
+
         # TODO finish off
         if options['nipt']:
-            # run files are nested one folder further in NIPT runs
-            full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder + 'runs/')
             # reformat data if NIPT run  
             #full_samplesheet_dict = parse_samplesheet.sort_nipt_data(full_samplesheet_dict)
-        else:
-            full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
+
 
         # extract run level fields from samplesheet dict and add to run level dictionary
         run_level_dict.update(parse_samplesheet.extract_data(full_samplesheet_dict))
