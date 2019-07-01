@@ -100,7 +100,6 @@ def make_data_section_dict(worksheets, data_section):
     Take the data section dictionary after the descriptions have been included and 
     format it into a dictionary
     """
-    #print(data_section)
     data_dict = {}
     for worksheet in worksheets:
         # TODO change column for NIPT - maybe make seperate function for nipt
@@ -153,25 +152,41 @@ def make_data_section_dict(worksheets, data_section):
     return data_dict
 
 
-'''
-def sort_samplesheet_sex(samplesheet_dict):
-    for ws in samplesheet_dict['Data']:
-        ws_dict = samplesheet_dict['Data'][ws]
-        for sample in ws_dict['samples']:
-            sample_dict = ws_dict['samples'][sample]
-            try:
-                if sample_dict['sex'] == '1':
-                    sex = 'M'
-                elif sample_dict['sex'] == '2':
-                    sex = 'F'
-                else:
-                    sex = ''
-            except KeyError:
-                sex = ''
-            samplesheet_dict['Data'][ws]['samples'][sample]['sex'] = sex
+def make_data_section_dict_nipt(worksheets, data_section):
+    data_dict = {}
+    for worksheet in worksheets:
+        # 
+        subset = data_section[data_section.Sample_Project == worksheet]
+        assert len(subset.Sample_Project.unique()) == 1
 
-    return samplesheet_dict
-'''
+        # extract sample specific info from df into json
+        ws_specific = ['Sample_Plate', 'Sample_Project']
+        sample_specific_json = json.loads(subset.drop(ws_specific, axis=1).to_json(orient='index'))
+
+        for s in sample_specific_json:
+            # make sure there is always a sex field
+            try:
+                sample_specific_json[s]['sex']
+            except KeyError:
+                sample_specific_json[s]['sex'] = ''
+            # reformat values to prevent downstream errors
+            for key, value in sample_specific_json[s].items():
+                if value == None:
+                    sample_specific_json[s][key] = ''
+
+        # add to python dic with worksheet as the key
+        data_dict[worksheet] = {
+            'Sample_Project': subset.Sample_Project.unique()[0],
+            'Sample_Plate': '',
+            'pipelineName': '',
+            'pipelineVersion': '',
+            'panel': 'NIPT',
+            'samples': sample_specific_json
+            }
+        
+    return data_dict
+
+
 
 # ## Combine header, reads and data into JSON object
 
@@ -181,7 +196,7 @@ def sort_samplesheet_sex(samplesheet_dict):
 # combine all dicts at the end and make json file
 # return json file as string
 
-def get_samplesheet_dict(run_folder):
+def get_samplesheet_dict(run_folder, run_type=''):
     
     filename = get_samplesheet_path(run_folder)
 
@@ -224,22 +239,18 @@ def get_samplesheet_dict(run_folder):
         if section == 'Data':
             data_section = pd.DataFrame(extract[1:], columns=extract[0])
             data_section = extract_description_data(data_section)
-            worksheets = data_section.Sample_Plate.unique()
-            extract_dict = make_data_section_dict(worksheets, data_section)
+            if run_type == 'nipt':
+                worksheets = data_section.Sample_Project.unique()
+                extract_dict = make_data_section_dict_nipt(worksheets, data_section)
+            else:
+                worksheets = data_section.Sample_Plate.unique()
+                extract_dict = make_data_section_dict(worksheets, data_section)
         else:
             pass
             # TODO add handling for other sections - make dict and add to combined dict
         combined_dict[section] = extract_dict
 
-    #combined_dict = sort_samplesheet_sex(combined_dict)
-
     return combined_dict
-
-
-
-
-
-
 
 
 def extract_data(samplesheet_dict):

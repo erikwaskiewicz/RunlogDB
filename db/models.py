@@ -146,7 +146,6 @@ class SampleRun(models.Model):
     i7_name = models.CharField(max_length=255, blank=True)
     i7_seq = models.CharField(max_length=255, blank=True)
     sample_well = models.CharField(max_length=255, blank=True)
-    sample_project = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.unique_id

@@ -41,7 +41,6 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
                     i7_name=sample_data['I7_Index_ID'],
                     i7_seq=sample_data['index'],
                     sample_well=sample_data['Sample_Well'],
-                    sample_project=sample_data['Sample_Project']
                     )
                 sample_run_obj.save()
 
