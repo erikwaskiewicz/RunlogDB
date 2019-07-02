@@ -110,20 +110,26 @@ def make_data_section_dict(worksheets, data_section):
 
         subset = data_section[data_section.Sample_Plate == worksheet]
 
-        assert len(subset.Sample_Plate.unique()) == 1
-        assert len(subset.panel.unique()) == 1, 'Multiple panels for one worksheet, check samplesheet'
-        assert len(subset.pipelineName.unique()) == 1, 'Multiple pipelines for one worksheet, check samplesheet'
-        assert len(subset.pipelineVersion.unique()) == 1, 'Multiple pipeline versions for one worksheet, check samplesheet'
+        try:
+            assert len(subset.Sample_Plate.unique()) == 1
+            assert len(subset.panel.unique()) == 1, 'Multiple panels for one worksheet, check samplesheet'
+            assert len(subset.pipelineName.unique()) == 1, 'Multiple pipelines for one worksheet, check samplesheet'
+            assert len(subset.pipelineVersion.unique()) == 1, 'Multiple pipeline versions for one worksheet, check samplesheet'
+        except AssertionError as err:
+            exit(f"ERROR  {err}") # TODO add logging
 
         # list values that are common to all samples, extract the variables
-        ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion']
+        ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion', ''] # add empty string to remove any extra columns that might be caused by trailing commas in the csv
         sample_plate = subset.Sample_Plate.unique()[0]
         pipeline_name = subset.pipelineName.unique()[0]
         pipeline_version = subset.pipelineVersion.unique()[0]
         panel = subset.panel.unique()[0]
 
         # extract sample specific info from df into json
-        sample_specific_json = json.loads(subset.drop(ws_specific, axis=1).to_json(orient='index'))
+        try:
+            sample_specific_json = json.loads(subset.drop(ws_specific, axis=1).to_json(orient='index'))
+        except ValueError:
+            exit(f"ERROR  Couldn't parse data section of SampleSheet") # TODO add logging
 
         for s in sample_specific_json:
             # make sure there is always a sex field
@@ -161,10 +167,13 @@ def make_data_section_dict_nipt(worksheets, data_section, experiment_name):
 
         # extract sample specific info from df into json
         subset = subset.drop(subset[subset.Lane == '2'].index)
-        ws_specific = ['Sample_Plate', 'Sample_Project']
+        ws_specific = ['Sample_Plate', 'Sample_Project', ''] # add empty string to remove any extra columns that might be caused by trailing commas in the csv
         subset_processed = subset.drop(ws_specific, axis=1).set_index('Sample_ID')
 
-        sample_specific_json = json.loads(subset_processed.to_json(orient='index'))
+        try:
+            sample_specific_json = json.loads(subset_processed.to_json(orient='index'))
+        except ValueError:
+            exit(f"ERROR  Couldn't parse data section of SampleSheet") # TODO add logging
 
         for s in sample_specific_json:
             # make sure there is always a sex field

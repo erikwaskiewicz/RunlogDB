@@ -24,7 +24,7 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
         for s in samples:
             sample_data = ws_data['samples'][s]
             #if name is just NTC, add the ws id to the name
-            if s in ['NTC', 'NTC-TAM', 'NTCTAM', 'NTC-BRCA', 'NTCBRCA', 'NTC-FOCUS4', 'NTCFOCUS4', 'NTC-CRM', 'NTCCRM']:
+            if s in ['NTC', 'NTC-TAM', 'NTCTAM', 'NTC-BRCA', 'NTCBRCA', 'NTC-FOCUS4', 'NTCFOCUS4', 'NTC-CRM', 'NTCCRM', 'NTC-WCB', 'NTCWCB']:
                 s = f'{s}-{ws}'
 
             # add sample object 
