@@ -234,7 +234,7 @@ def get_samplesheet_dict(run_folder, run_type=''):
             if line[0] == '' or n == (no_of_lines - 1):
                 if line[0] == '':
                     end = n
-                if n == (no_of_lines - 1):
+                elif n == (no_of_lines - 1):
                     end = n+1
                 section_line_nos[key] = [start, end]
                 in_section = False
