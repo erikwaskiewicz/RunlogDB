@@ -116,11 +116,11 @@ class Worksheet(models.Model):
             return "CRM"
         elif self.panel == "NGHS-102X":
             return "BRCA"
-        elif self.panel == "CRUK":
+        elif self.panel == "SMP2v2":
             return "CRUK"
-        elif self.panel == "TruSightCancer":
+        elif self.panel == "IlluminaTruSightCancer":
             return "TruSightCancer"
-        elif self.panel == "TruSightOne":
+        elif self.panel == "IlluminaTruSightOne":
             return "TruSightOne"
         elif self.panel == "NGHS-201X":
             return "TAM"

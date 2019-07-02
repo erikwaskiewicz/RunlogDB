@@ -74,7 +74,14 @@ def extract_description_data(data_section):
         # subset the data to only include the sample row
         subset = data_section[data_section.Sample_ID == sample]
         # make an df for the row data with sample ID for merging later on
-        temp_df = pd.DataFrame(data={'Sample_ID': [ sample ]})
+        temp_df = pd.DataFrame(
+            data={
+                'Sample_ID': [ sample ],
+                'pipelineName': [''],
+                'pipelineVersion': [''],
+                'panel': ['']
+                }
+            )
 
         # split the description field into its key-value pairs and loop through
         desc = subset.Description.values[0].split(';')
@@ -111,8 +118,11 @@ def make_data_section_dict(worksheets, data_section):
         assert len(subset.pipelineVersion.unique()) == 1
 
         # change NTC to NTC-worksheet_number
-        subset.at['NTC', 'Sample_Name'] = f'NTC-{worksheet}' # change sample_name
-        subset.rename(index={'NTC': f'NTC-{worksheet}'}, inplace=True) # change sample ID index
+        #subset.at['NTC', 'Sample_Name'] = f'NTC-{worksheet}' # change sample_name
+        #subset.rename(index={'NTC': f'NTC-{worksheet}'}, inplace=True) # change sample ID index
+        # TODO think this is adding an ntc if there isnt one there
+
+        # TODO remove empty ws numbers - CRUK 
 
         # list values that are common to all samples, extract the variables
         ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion']
@@ -262,7 +272,7 @@ def get_samplesheet_dict(run_folder, run_type=''):
         else:
             extract_dict = format_section(extract)
 
-            # TODO add handling for other sections - make dict and add to combined dict
+            # TODO add panel as unknown if it isnt there
         combined_dict[section] = extract_dict
 
     return combined_dict
