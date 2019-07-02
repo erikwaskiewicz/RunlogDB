@@ -130,8 +130,10 @@ class Worksheet(models.Model):
             return "PanCancer"
         elif self.panel == "NIPT":
             return "NIPT"
-        else:
+        elif self.panel == "":
             return "Unknown"
+        else:
+            return self.panel
 
 
 class SampleRun(models.Model):

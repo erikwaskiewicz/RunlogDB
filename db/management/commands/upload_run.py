@@ -9,6 +9,10 @@ from db.models import Sample, Instrument, Run, Worksheet, SampleRun
 def add_to_db(full_samplesheet_dict, run_level_dict):
     worksheets = full_samplesheet_dict['Data'].keys()
     worksheet_obj_list = []
+
+    if '' in worksheets:
+        exit(f"ERROR  Empty worksheet ID, check samplesheet") # TODO add logging
+
     for ws in worksheets:
         # within in worsheet, loops through samples
         ws_data = full_samplesheet_dict['Data'][ws]
