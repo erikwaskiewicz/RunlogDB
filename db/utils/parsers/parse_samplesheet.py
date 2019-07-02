@@ -119,7 +119,10 @@ def make_data_section_dict(worksheets, data_section):
             exit(f"ERROR  {err}") # TODO add logging
 
         # list values that are common to all samples, extract the variables
-        ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion', ''] # add empty string to remove any extra columns that might be caused by trailing commas in the csv
+        ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion'] 
+        # add empty string to remove any extra columns that might be caused by trailing commas in the csv
+        if '' in subset.columns:
+            ws_specific += ['']
         sample_plate = subset.Sample_Plate.unique()[0]
         pipeline_name = subset.pipelineName.unique()[0]
         pipeline_version = subset.pipelineVersion.unique()[0]
@@ -167,7 +170,10 @@ def make_data_section_dict_nipt(worksheets, data_section, experiment_name):
 
         # extract sample specific info from df into json
         subset = subset.drop(subset[subset.Lane == '2'].index)
-        ws_specific = ['Sample_Plate', 'Sample_Project', ''] # add empty string to remove any extra columns that might be caused by trailing commas in the csv
+        ws_specific = ['Sample_Plate', 'Sample_Project'] 
+        # add empty string to remove any extra columns that might be caused by trailing commas in the csv
+        if '' in subset.columns:
+            ws_specific += ['']
         subset_processed = subset.drop(ws_specific, axis=1).set_index('Sample_ID')
 
         try:
