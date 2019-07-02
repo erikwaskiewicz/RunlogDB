@@ -186,7 +186,6 @@ class Command(BaseCommand):
         else:
             full_samplesheet_dict = parse_samplesheet.get_samplesheet_dict(run_folder)
 
-
         # extract run level fields from samplesheet dict and add to run level dictionary
         run_level_dict.update(parse_samplesheet.extract_data(full_samplesheet_dict))
         run_level_dict['raw_samplesheet_json'] = json.dumps(full_samplesheet_dict, indent=2, separators=(',', ':'))

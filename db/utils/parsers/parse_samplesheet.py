@@ -12,7 +12,7 @@ def get_samplesheet_path(run_folder):
     """
     samplesheet_path = run_folder + r"/SampleSheet.csv"
     if os.path.isfile(samplesheet_path) is False:
-        print("\tCould not open file", samplesheet_path) #TODO add logging
+        exit(f"ERROR  Couldn't open file {samplesheet_path}") #TODO add logging
 
     return samplesheet_path
 
@@ -56,8 +56,6 @@ def format_reads_section(reads_section):
         reads_dict[key] = value
     
     return reads_dict
-
-
 
 
 #---------------------------------------------------------------------------
@@ -113,16 +111,9 @@ def make_data_section_dict(worksheets, data_section):
         subset = data_section[data_section.Sample_Plate == worksheet]
 
         assert len(subset.Sample_Plate.unique()) == 1
-        assert len(subset.panel.unique()) == 1
-        assert len(subset.pipelineName.unique()) == 1
-        assert len(subset.pipelineVersion.unique()) == 1
-
-        # change NTC to NTC-worksheet_number
-        #subset.at['NTC', 'Sample_Name'] = f'NTC-{worksheet}' # change sample_name
-        #subset.rename(index={'NTC': f'NTC-{worksheet}'}, inplace=True) # change sample ID index
-        # TODO think this is adding an ntc if there isnt one there
-
-        # TODO remove empty ws numbers - CRUK 
+        assert len(subset.panel.unique()) == 1, 'Multiple panels for one worksheet, check samplesheet'
+        assert len(subset.pipelineName.unique()) == 1, 'Multiple pipelines for one worksheet, check samplesheet'
+        assert len(subset.pipelineVersion.unique()) == 1, 'Multiple pipeline versions for one worksheet, check samplesheet'
 
         # list values that are common to all samples, extract the variables
         ws_specific = ['Sample_Plate', 'panel', 'pipelineName', 'pipelineVersion']
@@ -169,7 +160,6 @@ def make_data_section_dict_nipt(worksheets, data_section, experiment_name):
         assert len(subset.Sample_Project.unique()) == 1
 
         # extract sample specific info from df into json
-        # TODO - rename NTC as NTC+WS??
         subset = subset.drop(subset[subset.Lane == '2'].index)
         ws_specific = ['Sample_Plate', 'Sample_Project']
         subset_processed = subset.drop(ws_specific, axis=1).set_index('Sample_ID')
@@ -272,7 +262,6 @@ def get_samplesheet_dict(run_folder, run_type=''):
         else:
             extract_dict = format_section(extract)
 
-            # TODO add panel as unknown if it isnt there
         combined_dict[section] = extract_dict
 
     return combined_dict
