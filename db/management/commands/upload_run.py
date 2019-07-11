@@ -14,6 +14,7 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
         exit(f"ERROR  Empty worksheet ID, check samplesheet") # TODO add logging
 
     for ws in worksheets:
+        # TODO add warning if worksheet already exists?
         # within in worsheet, loops through samples
         ws_data = full_samplesheet_dict['Data'][ws]
         samples = ws_data['samples'].keys()
@@ -23,8 +24,9 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
 
         for s in samples:
             sample_data = ws_data['samples'][s]
+            
             #if name is just NTC, add the ws id to the name
-            if s in ['NTC', 'NTC-TAM', 'NTCTAM', 'NTC-BRCA', 'NTCBRCA', 'NTC-FOCUS4', 'NTCFOCUS4', 'NTC-CRM', 'NTCCRM', 'NTC-WCB', 'NTCWCB']:
+            if ('NTC' in s and ws not in s):
                 s = f'{s}-{ws}'
 
             # add sample object 
@@ -36,7 +38,7 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
             sample_obj_list += [sample_obj]
 
             # add samplerun object
-            samplerun_uid = f"{s}_{ws}_{run_level_dict['run_id']}"
+            samplerun_uid = f"{s}_{ws}_{run_level_dict['run_id']}".upper()
             try:
                 sample_run_obj = SampleRun.objects.get(unique_id=samplerun_uid)
             except SampleRun.DoesNotExist:
@@ -94,11 +96,11 @@ def add_to_db(full_samplesheet_dict, run_level_dict):
 
     # add run
     try:
-        run_obj = Run.objects.get(run_id=run_level_dict['run_id'])
+        run_obj = Run.objects.get(run_id=run_level_dict['run_id'].upper())
         # TODO add warning if run already exists?
     except Run.DoesNotExist:
         run_obj = Run(
-            run_id=run_level_dict['run_id'],
+            run_id=run_level_dict['run_id'].upper(),
             instrument=instrument_obj,
             instrument_date=run_level_dict['instrument_date'],
             samplesheet_date=run_level_dict['samplesheet_date'],

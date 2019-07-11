@@ -17,7 +17,7 @@ def index(request):
                 # save input variables
                 search = form.cleaned_data
                 # perform query based on input values
-                #runs = Run.objects.all()
+                # TODO - turn into datatable and remove search box - replace with datatables equivalent
                 runs = Run.objects.filter(
                     run_id__contains=search['run_id'], 
                     experiment__contains=search['experiment'],
@@ -44,12 +44,15 @@ def index(request):
                 wb = openpyxl.Workbook()
                 panels = ['BRCA', 'CRM', 'CRUK', 'NIPT', 'TAM', 'TruSightCancer', 'TruSightOne', 'TruSightMyeloid', 'RochePanCancer']
                 # Fill in raw data tab, panels tab and others tab
-                tab_other(wb, runs, panels)
-                tab_panels(wb, runs, panels)
-                tab_raw(wb, runs)
+                # TODO - make these work
+
+                #tab_other(wb, runs, panels)
+                #tab_panels(wb, runs, panels)
+                #tab_raw(wb, runs)
+                
                 # save and return workbook as response
                 response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheet.sheet')
-                output_name = 'attachment; filename="KPI_' + str(dates.start_date) + '_' + str(dates.end_date) + '.xlsx"'
+                output_name = 'attachment; filename="KPI_' + str(dates['start_date']) + '_' + str(dates['end_date']) + '.xlsx"'
                 response['Content-Disposition'] = output_name
                 wb.save(response)
                 return response
