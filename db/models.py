@@ -1,12 +1,6 @@
 from django.db import models
 import json
 
-class Sample(models.Model):
-    sample_id = models.CharField(max_length=255, primary_key=True)
-
-    def __str__(self):
-        return self.sample_id
-
 
 class Instrument(models.Model):
     instrument_id = models.CharField(max_length=255, primary_key=True)
@@ -23,8 +17,8 @@ class Run(models.Model):
     Also stores raw JSON object of the input files.
     """
     run_id = models.CharField(max_length=255, primary_key=True)
-    worksheets = models.ManyToManyField('Worksheet')
-    instrument = models.ForeignKey('Instrument', on_delete=models.CASCADE)
+    #worksheets = models.ManyToManyField('Worksheet')
+    instrument = models.OneToOneField('Instrument', on_delete=models.CASCADE)
 
     instrument_date = models.DateField()
     setup_date = models.DateField(blank=True, null=True)
@@ -92,20 +86,30 @@ class Run(models.Model):
 
 
 class Worksheet(models.Model):
-    ws_id = models.CharField(max_length=255, primary_key=True)
-    samples = models.ManyToManyField('SampleRun')
+    worksheet_id = models.CharField(max_length=255, primary_key=True)
+
+    def __str__(self):
+        return self.worksheet_id
+
+
+class WorksheetAnalysis(models.Model):
+    unique_id = models.CharField(max_length=255, primary_key=True) # run+ws+analysis_count
+    #samples = models.ManyToManyField('SampleRun')
+    worksheet = models.OneToOneField('Worksheet', on_delete=models.CASCADE)
+    run = models.ForeignKey('Run', on_delete=models.CASCADE)
 
     pipeline_name = models.CharField(max_length=255, blank=True)
     pipeline_version = models.CharField(max_length=255, blank=True)
     panel = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
-        return self.ws_id
+        return self.unique_id
 
     def list_samples(self):
         """Make a string list of all samples in a worksheet"""
-        sample_runs = self.samples.all()
-        samples = [s.sample_obj.sample_id for s in sample_runs]
+        #TODO check this function works for new database layout
+        sample_analyses = SampleAnalysis.objects.filter(worksheet_analysis=self.unique_id)
+        samples = [s.sample.sample_id for s in sample_analyses]
         return ', '.join(samples)
 
     def get_panel(self):
@@ -136,9 +140,17 @@ class Worksheet(models.Model):
             return self.panel
 
 
-class SampleRun(models.Model):
-    unique_id = models.CharField(max_length=255, primary_key=True) #run+ws+sample_id
-    sample_obj = models.ForeignKey('Sample', on_delete=models.CASCADE)
+class Sample(models.Model):
+    sample_id = models.CharField(max_length=255, primary_key=True)
+
+    def __str__(self):
+        return self.sample_id
+
+
+class SampleAnalysis(models.Model):
+    unique_id = models.CharField(max_length=255, primary_key=True) #ws_analysis+sample_id
+    sample = models.OneToOneField('Sample', on_delete=models.CASCADE)
+    worksheet_analysis = models.ForeignKey('WorksheetAnalysis', on_delete=models.CASCADE)
 
     description = models.TextField(blank=True)
     sex = models.CharField(max_length=255, blank=True)
@@ -159,9 +171,9 @@ class Fastqc(models.Model):
     There is a fastq file made for each lane and each read, so a run will usually have 2-4.
     """
     unique_id = models.CharField(max_length=255, primary_key=True) #samplerun + read + lane
-    #link to sample run object
+    #link to sample analysis object
     sample = models.ForeignKey(
-        'SampleRun',
+        'SampleAnalysis',
         on_delete=models.CASCADE,
     )
     read_group = models.CharField(max_length=255, blank=True)
